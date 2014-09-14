@@ -1,0 +1,6 @@
+
+==Singles==
+{| class="wikitable plainrowheaders" style="text-align:center;" border="1"
+|-
+| 53 || — || — || — || — || — || 91 || — || — || — || — || —
+|}
