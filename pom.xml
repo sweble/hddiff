@@ -179,6 +179,43 @@
         <artifactId>git-commit-id-plugin</artifactId>
       </plugin>
 
+		<!-- creating JavaDoc -->
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-javadoc-plugin</artifactId>
+			<version>2.7</version>
+			<configuration>
+				<doctitle>${project.name}</doctitle>
+				<minmemory>1024m</minmemory>
+				<maxmemory>1024m</maxmemory>
+				<links>
+					<link>http://download.oracle.com/javase/6/docs/api/</link>
+					<link>http://xerces.apache.org/xerces-j/apiDocs/</link>
+				</links>
+				<splitindex>true</splitindex>
+				<windowtitle>${project.name} v${project.version} - https://github.com/sweble/hddiff-project</windowtitle>
+			</configuration>
+			<executions>
+				<execution>
+					<id>attach-javadocs</id>
+					<goals>
+						<goal>jar</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+		<plugin>
+			<artifactId>maven-source-plugin</artifactId>
+			<version>2.1.2</version>
+			<executions>
+				<execution>
+					<id>attach-sources</id>
+					<goals>
+						<goal>jar</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>      
     </plugins>
 
     <!-- ==[ Plugin Management ]============================================ -->
