@@ -55,8 +55,7 @@ public class WomDiffNodeAdapterText
 		node.setTextContent(ta);
 		
 		Wom3Node nb = (Wom3Node) node.getOwnerDocument().createElementNS(
-				Wom3Node.WOM_NS_URI,
-				Wom3Node.DEFAULT_WOM_NS_PREFIX + ":text");
+				Wom3Node.WOM_NS_URI, "text");
 		nb.setTextContent(tb);
 		
 		WomDiffNodeAdapterText nbWd = new WomDiffNodeAdapterText(nb);

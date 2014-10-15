@@ -64,7 +64,8 @@ public abstract class DiffNode
 	public final void setOverride(DiffNode partner, int common)
 	{
 		if (!isSameNodeType(partner))
-			throw new AssertionError("!isSameNodeType(partner)");
+			throw new AssertionError("!isSameNodeType(partner): "
+					+ String.valueOf(this.getType()) + " vs. " + String.valueOf(partner.getType()));
 		this.partner = partner;
 		this.common = common;
 	}
