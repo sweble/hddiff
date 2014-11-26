@@ -60,7 +60,7 @@
   <properties>
 
     <!-- Configuration of parent POMs -->
-    <maven-site-plugin.skip>true</maven-site-plugin.skip>
+    <!-- <maven-site-plugin.skip>true</maven-site-plugin.skip> -->
 
     <hddiff-project.basedir>${project.basedir}</hddiff-project.basedir>
     <hddiff-project.etc>${hddiff-project.basedir}/etc</hddiff-project.etc>
