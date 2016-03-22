@@ -26,7 +26,7 @@
   <parent>
     <groupId>de.fau.cs.osr.hddiff</groupId>
     <artifactId>hddiff-project</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
   </parent>
 
   <!-- This POM: HDDiff - Performance Suite -->
