@@ -79,7 +79,7 @@ in the repository:
 <distributionManagement>
   <repository>
     <id>3rd-party-releases</id>
-    <url>http://mojo.cs.fau.de/nexus/content/repositories/3rd-party-releases</url>
+    <url>http://mojo-maven.cs.fau.de/content/repositories/3rd-party-releases</url>
   </repository>
 </distributionManagement>
 ```

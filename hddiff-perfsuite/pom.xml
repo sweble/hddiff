@@ -26,7 +26,7 @@
   <parent>
     <groupId>de.fau.cs.osr.hddiff</groupId>
     <artifactId>hddiff-project</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <!-- This POM: HDDiff - Performance Suite -->
@@ -205,7 +205,7 @@
     <connection>scm:git://sweble.org/git/hddiff-project.git</connection>
     <developerConnection>scm:git:ssh://gitosis@sweble.org/hddiff-project.git</developerConnection>
     <url>http://sweble.org/gitweb/?p=hddiff-project.git;a=summary</url>
-    <tag>hddiff-project-1.0.0</tag>
+    <tag>hddiff-project-1.1.0</tag>
   </scm>
 
   <!--

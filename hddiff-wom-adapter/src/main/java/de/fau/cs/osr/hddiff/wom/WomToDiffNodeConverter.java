@@ -27,7 +27,6 @@ import org.sweble.wom3.Wom3Node;
 import org.sweble.wom3.Wom3Repl;
 import org.sweble.wom3.Wom3Rtd;
 import org.sweble.wom3.Wom3Text;
-import org.sweble.wom3.impl.Backbone;
 import org.sweble.wom3.swcadapter.AstToWomConverter;
 
 import de.fau.cs.osr.hddiff.tree.DiffNode;
@@ -181,7 +180,7 @@ public class WomToDiffNodeConverter
 				Matcher m = LINK_OPEN_RX.matcher(text);
 				if (m.find())
 				{
-					Backbone insertBefore = rtd.getNextSibling();
+					Wom3Node insertBefore = rtd.getNextSibling();
 					
 					if (m.group(1) != null)
 					{
@@ -213,7 +212,7 @@ public class WomToDiffNodeConverter
 				}
 				else
 				{
-					Backbone insertBefore = rtd.getNextSibling();
+					Wom3Node insertBefore = rtd.getNextSibling();
 					separatePostfix(node, rtd, text, insertBefore);
 				}
 			}
@@ -234,7 +233,7 @@ public class WomToDiffNodeConverter
 			Wom3Node node,
 			Wom3Rtd rtd,
 			String text,
-			Backbone insertBefore)
+			Wom3Node insertBefore)
 	{
 		Matcher m2 = LINK_CLOSE_RX.matcher(text);
 		if (m2.find())

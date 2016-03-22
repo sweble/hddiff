@@ -73,7 +73,10 @@ public class WomDiffNodeAdapter
 	@Override
 	public Object getType()
 	{
-		return node.getNodeName();
+		String name = node.getLocalName();
+		if (name == null)
+			return node.getNodeName();
+		return node.getNamespaceURI() + node.getLocalName();
 	}
 	
 	@Override

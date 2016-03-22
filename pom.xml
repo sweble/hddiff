@@ -26,7 +26,7 @@
   <parent>
     <groupId>de.fau.cs.osr</groupId>
     <artifactId>tooling</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <relativePath>../tooling/pom.xml</relativePath>
   </parent>
 
@@ -34,7 +34,7 @@
 
   <groupId>de.fau.cs.osr.hddiff</groupId>
   <artifactId>hddiff-project</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <packaging>pom</packaging>
 
   <name>HDDiff Development Meta POM</name>
@@ -95,21 +95,21 @@
       <dependency>
         <groupId>de.fau.cs.osr.utils</groupId>
         <artifactId>utils</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
       </dependency>
 
       <!-- Sweble WOM 3.0 - SWC Adapter -->
       <dependency>
         <groupId>org.sweble.wom3</groupId>
         <artifactId>sweble-wom3-swc-adapter</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
       </dependency>
 
       <!-- Sweble Engine - Serialization -->
       <dependency>
         <groupId>org.sweble.engine</groupId>
         <artifactId>sweble-engine-serialization</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
       </dependency>
 
       <!-- ================================================================= -->
@@ -255,7 +255,7 @@
     <connection>scm:git://sweble.org/git/hddiff-project.git</connection>
     <developerConnection>scm:git:ssh://gitosis@sweble.org/hddiff-project.git</developerConnection>
     <url>http://sweble.org/gitweb/?p=hddiff-project.git;a=summary</url>
-    <tag>hddiff-project-1.0.0</tag>
+    <tag>hddiff-project-1.1.0</tag>
   </scm>
 
   <!--
@@ -273,9 +273,9 @@
         <updatePolicy>daily</updatePolicy>
         <checksumPolicy>warn</checksumPolicy>
       </snapshots>
-      <id>osr-public-snapshots-repo</id>
-      <name>OSR Public Snapshots Repository</name>
-      <url>http://mojo.cs.fau.de/nexus/content/repositories/public</url>
+      <id>osr-public-repo</id>
+      <name>OSR Public Repository</name>
+      <url>http://mojo-maven.cs.fau.de/content/repositories/public</url>
     </repository>
   </repositories>
 
