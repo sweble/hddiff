@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import de.fau.cs.osr.hddiff.HDDiffOptions.TreeDumpPhases;
 import de.fau.cs.osr.hddiff.editscript.EditOp;

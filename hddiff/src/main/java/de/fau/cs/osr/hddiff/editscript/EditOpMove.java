@@ -18,7 +18,7 @@
 package de.fau.cs.osr.hddiff.editscript;
 
 import de.fau.cs.osr.hddiff.tree.DiffNode;
-import de.fau.cs.osr.utils.StringUtils;
+import de.fau.cs.osr.utils.StringTools;
 
 /**
  * A node was found in the right tree whose parent does not match the respective
@@ -31,18 +31,18 @@ public class EditOpMove
 			EditOp
 {
 	private final DiffNode movedNode;
-	
+
 	private final DiffNode toParent;
-	
+
 	private final int finalPosition;
-	
+
 	/**
 	 * Additional information: The node in the right tree after the move.
 	 */
 	private final DiffNode movedNodeRight;
-	
+
 	// =========================================================================
-	
+
 	public EditOpMove(
 			DiffNode movedNode,
 			DiffNode toParent,
@@ -54,39 +54,39 @@ public class EditOpMove
 		this.movedNodeRight = movedNodeRight;
 		this.finalPosition = finalPosition;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public Operation getType()
 	{
 		return Operation.MOVE;
 	}
-	
+
 	// =========================================================================
-	
+
 	public DiffNode getMovedNode()
 	{
 		return movedNode;
 	}
-	
+
 	public DiffNode getToParent()
 	{
 		return toParent;
 	}
-	
+
 	public int getFinalPosition()
 	{
 		return finalPosition;
 	}
-	
+
 	public DiffNode getMovedNodeRight()
 	{
 		return movedNodeRight;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public String toString()
 	{
@@ -96,7 +96,7 @@ public class EditOpMove
 				"  insertedNode:\n%s\n" +
 				"  parent:\n%s\n",
 				finalPosition,
-				StringUtils.indent(movedNode.toString(), "    "),
-				StringUtils.indent(toParent.toString(), "    "));
+				StringTools.indent(movedNode.toString(), "    "),
+				StringTools.indent(toParent.toString(), "    "));
 	}
 }

@@ -18,148 +18,98 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM: HDDiff Development -->
+	<parent>
+		<groupId>de.fau.cs.osr.hddiff</groupId>
+		<artifactId>hddiff-parent</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
 
-  <parent>
-    <groupId>de.fau.cs.osr.hddiff</groupId>
-    <artifactId>hddiff-project</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
-  </parent>
+	<artifactId>hddiff-wom-adapter</artifactId>
+	<packaging>jar</packaging>
+	<name>HDDiff - WOM Adapter</name>
+	<inceptionYear>2014</inceptionYear>
+	<description>HighDefinition Diff WOM Adapter</description>
 
-  <!-- This POM: HDDiff - WOM Adapter -->
+	<!-- =================================================================== -->
+	<!-- Properties - Properties - Properties - Properties - Properties - Pr -->
+	<!-- =================================================================== -->
 
-  <!-- Same groupId as parent -->
-  <artifactId>hddiff-wom-adapter</artifactId>
-  <!-- Same version as parent -->
-  <packaging>jar</packaging>
+	<properties>
+		<hddiff-parent.path>../</hddiff-parent.path>
+	</properties>
 
-  <name>HDDiff - WOM Adapter</name>
-  <url>http://sweble.org/sites/swc-devel/develop-latest/tooling/hddiff-project/hddiff-wom-adapter</url>
-  <inceptionYear>2014</inceptionYear>
-  <description>HighDefinition Diff WOM Adapter</description>
+	<!-- =================================================================== -->
+	<!-- Dependencies - Dependencies - Dependencies - Dependencies - Depende -->
+	<!-- =================================================================== -->
 
-  <!-- ==[ Properties ]===================================================== -->
+	<dependencies>
 
-  <properties>
+		<!-- Utils -->
+		<dependency>
+			<groupId>de.fau.cs.osr.utils</groupId>
+			<artifactId>utils</artifactId>
+		</dependency>
 
-    <version.java>1.7</version.java>
+		<!-- Sweble - WOM 3.0 -->
+		<dependency>
+			<groupId>org.sweble.wom3</groupId>
+			<artifactId>sweble-wom3-core</artifactId>
+		</dependency>
 
-    <hddiff-project.basedir>${project.parent.basedir}</hddiff-project.basedir>
+		<!-- Sweble - WOM 3.0 SWC Adapter-->
+		<dependency>
+			<groupId>org.sweble.wom3</groupId>
+			<artifactId>sweble-wom3-swc-adapter</artifactId>
+		</dependency>
 
-  </properties>
+		<!-- HDDiff -->
+		<dependency>
+			<groupId>de.fau.cs.osr.hddiff</groupId>
+			<artifactId>hddiff</artifactId>
+		</dependency>
 
-  <!-- ==[ Dependencies ]=================================================== -->
+		<!-- =============================================================== -->
+		<!-- Testing - Testing - Testing - Testing - Testing - Testing - Tes -->
+		<!-- =============================================================== -->
 
-  <dependencies>
+		<!-- JUnit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-    <!-- Sweble - WOM 3.0 -->
-    <dependency>
-      <groupId>org.sweble.wom3</groupId>
-      <artifactId>sweble-wom3-swc-adapter</artifactId>
-    </dependency>
+	</dependencies>
 
-    <!-- HDDiff -->
-    <dependency>
-      <groupId>de.fau.cs.osr.hddiff</groupId>
-      <artifactId>hddiff</artifactId>
-    </dependency>
+	<build>
 
-    <!--
-      Testing
-    -->
+		<!-- =============================================================== -->
+		<!-- Plugins - Plugins - Plugins - Plugins - Plugins - Plugins - Plu -->
+		<!-- =============================================================== -->
 
-    <!-- JUnit -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
+		<plugins>
 
-  </dependencies>
+			<!-- Maven Dependency Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>analyze-dependency-usage</id>
+						<configuration>
+							<usedDependencies>
+								<usedDependency>org.sweble.wom3:sweble-wom3-swc-adapter</usedDependency>
+							</usedDependencies>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-  <!-- ==[ Dependency Management ]========================================== -->
-
-  <dependencyManagement>
-  </dependencyManagement>
-
-  <build>
-
-    <!-- ==[ Resource Configuration ]======================================= -->
-
-    <!--
-      see parent: <resources>
-    -->
-
-    <!-- ==[ Plugin Configuration ]========================================= -->
-
-    <plugins>
-    </plugins>
-
-    <!-- ==[ Plugin Management ]============================================ -->
-
-    <pluginManagement>
-    </pluginManagement>
-
-    <!-- ==[ Build Element Set ]============================================ -->
-
-    <!--
-      see parent: <sourceDirectory>
-                  <scriptSourceDirectory>
-                  <testSourceDirectory>
-                  <outputDirectory>
-                  <testOutputDirectory>
-                  <extensions>
-    -->
-
-  </build>
-
-  <!-- ==[ Reporting ]====================================================== -->
-
-  <!--
-    see parent: <reporting>
-  -->
-
-  <!-- ==[ More Project Information ]======================================= -->
-
-  <licenses>
-    <license>
-      <name>GNU Affero General Public License</name>
-      <url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <!--
-    see parent: <organization>
-                <developers>
-                <contributors>
-  -->
-
-  <!-- ==[ Environment Settings ]=========================================== -->
-
-  <!--
-    see parent: <issueManagement>
-                <ciManagement>
-                <mailingLists>
-  -->
-
-  <scm>
-    <connection>scm:git://sweble.org/git/hddiff-project.git</connection>
-    <developerConnection>scm:git:ssh://gitosis@sweble.org/hddiff-project.git</developerConnection>
-    <url>http://sweble.org/gitweb/?p=hddiff-project.git;a=summary</url>
-    <tag>HEAD</tag>
-  </scm>
-
-  <!--
-    see parent: <distributionManagement>
-                <repositories>
-                <pluginRepositories>
-  -->
-
-  <!-- ==[ Profiles ]======================================================= -->
-
-  <profiles />
-
+		</plugins>
+	</build>
 </project>

@@ -39,8 +39,8 @@ various configurations. The results are written to a report file called
 
    Hint:
    ```
-   e.g. [PATH TO XYDIFF LIB DIRECTORY]: /local/opt/xydiff/lib
-   e.g. [PATH TO XYDIFF BINARY]: /local/opt/xydiff/bin/xydiff
+   e.g. &lt;PATH TO XYDIFF LIB DIRECTORY]: /local/opt/xydiff/lib
+   e.g. &lt;PATH TO XYDIFF BINARY]: /local/opt/xydiff/bin/xydiff
    ```
    The real location depends on your arguments to 
    `./configure --prefix=[INSTALL PATH]` when you were installing `XyDiff`.

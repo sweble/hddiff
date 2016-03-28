@@ -17,7 +17,7 @@
  */
 package de.fau.cs.osr.hddiff.tree;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import de.fau.cs.osr.utils.ComparisonException;
 

@@ -18,270 +18,236 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM: Tooling -->
+	<parent>
+		<groupId>de.fau.cs.osr</groupId>
+		<artifactId>tooling</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
 
-  <parent>
-    <groupId>de.fau.cs.osr</groupId>
-    <artifactId>tooling</artifactId>
-    <version>2.1.1-SNAPSHOT</version>
-    <relativePath>../tooling/pom.xml</relativePath>
-  </parent>
+	<groupId>de.fau.cs.osr.hddiff</groupId>
+	<artifactId>hddiff-parent</artifactId>
+	<version>2.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>HDDiff Parent</name>
+	<inceptionYear>2014</inceptionYear>
+	<description>
+		This is a POM to group those projects into submodules which constitute 
+		or are needed for the development of the HDDiff project. This POM is 
+		necessary when using the Maven Eclipse plugin to properly set-up 
+		inter-project dependencies in the generated Eclipse projects.
+	</description>
 
-  <!-- This POM: HDDiff Development -->
+	<modules>
+		<module>hddiff</module>
+		<module>hddiff-perfsuite</module>
+		<module>hddiff-wom-adapter</module>
+	</modules>
 
-  <groupId>de.fau.cs.osr.hddiff</groupId>
-  <artifactId>hddiff-project</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+	<!-- =================================================================== -->
+	<!-- Properties - Properties - Properties - Properties - Properties - Pr -->
+	<!-- =================================================================== -->
 
-  <name>HDDiff Development Meta POM</name>
-  <url>http://sweble.org/sites/swc-devel/develop-latest/tooling/hddiff-project</url>
-  <inceptionYear>2014</inceptionYear>
-  <description>
-    This is a POM to group those projects into submodules which constitute or
-    are needed for the development of the HDDiff project.
-    This POM is necessary when using the Maven Eclipse plugin to properly
-    set-up inter-project dependencies in the generated Eclipse projects.
-  </description>
+	<properties>
+		<hddiff-parent.path>${project.basedir}</hddiff-parent.path>
+		<hddiff-parent.etc-path>${hddiff-parent.path}/etc</hddiff-parent.etc-path>
+		<tooling.etc-path>${hddiff-parent.etc-path}</tooling.etc-path>
 
-  <!-- ==[ Submodules ]===================================================== -->
+		<!-- Java compiler source and target version -->
+		<maven.compiler.source>1.7</maven.compiler.source>
 
-  <modules>
-    <module>hddiff</module>
-    <module>hddiff-perfsuite</module>
-    <module>hddiff-wom-adapter</module>
-  </modules>
+		<!-- hddiff-parent currently does not conform :( -->
+		<maven-checkstyle-plugin.skip>true</maven-checkstyle-plugin.skip>
 
-  <!-- ==[ Properties ]===================================================== -->
+		<!-- Dependencies -->
+		<osr-common.version>3.0.0-SNAPSHOT</osr-common.version>
+		<sweble.version>3.0.0-SNAPSHOT</sweble.version>
+	</properties>
 
-  <properties>
+	<!-- =================================================================== -->
+	<!-- Dependency Management - Dependency Management - Dependency Manageme -->
+	<!-- =================================================================== -->
 
-    <!-- Configuration of parent POMs -->
-    <!-- <maven-site-plugin.skip>true</maven-site-plugin.skip> -->
+	<dependencyManagement>
+		<dependencies>
 
-    <hddiff-project.basedir>${project.basedir}</hddiff-project.basedir>
-    <hddiff-project.etc>${hddiff-project.basedir}/etc</hddiff-project.etc>
+			<!-- =========================================================== -->
+			<!-- OSR Common - OSR Common - OSR Common - OSR Common - OSR Com -->
+			<!-- =========================================================== -->
 
-    <!-- Dependency versions -->
-    <version.dep.osr>2.0.1-SNAPSHOT</version.dep.osr>
-    <version.dep.sweble>2.0.1-SNAPSHOT</version.dep.sweble>
-    <version.dep.gson>2.1</version.dep.gson>
+			<!-- Utils -->
+			<dependency>
+				<groupId>de.fau.cs.osr.utils</groupId>
+				<artifactId>utils</artifactId>
+				<version>${osr-common.version}</version>
+			</dependency>
 
-    <!-- Plugin dependency versions -->
-    <!-- ... -->
+			<!-- Utils - Testing -->
+			<dependency>
+				<groupId>de.fau.cs.osr.utils</groupId>
+				<artifactId>utils-testing</artifactId>
+				<version>${osr-common.version}</version>
+			</dependency>
 
-  </properties>
+			<!-- =========================================================== -->
+			<!-- Sweble Wikitext Components - Sweble Wikitext Components - S -->
+			<!-- =========================================================== -->
 
-  <!-- ==[ Dependency Management ]========================================== -->
+			<!-- Sweble Wikitext Components - Engine -->
+			<dependency>
+				<groupId>org.sweble.wikitext</groupId>
+				<artifactId>swc-engine</artifactId>
+				<version>${sweble.version}</version>
+			</dependency>
 
-  <dependencyManagement>
-    <dependencies>
+			<!-- =========================================================== -->
+			<!-- Sweble WOM v3 - Sweble WOM v3 - Sweble WOM v3 - Sweble WOM  -->
+			<!-- =========================================================== -->
 
-      <!-- Google Gson -->
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>${version.dep.gson}</version>
-      </dependency>
+			<!-- Sweble - WOM 3.0 Core -->
+			<dependency>
+				<groupId>org.sweble.wom3</groupId>
+				<artifactId>sweble-wom3-core</artifactId>
+				<version>${sweble.version}</version>
+			</dependency>
 
-      <!-- ================================================================= -->
-      <!--   Sweble Dependencies                                             -->
-      <!-- ================================================================= -->
+			<!-- Sweble WOM 3.0 - SWC Adapter -->
+			<dependency>
+				<groupId>org.sweble.wom3</groupId>
+				<artifactId>sweble-wom3-swc-adapter</artifactId>
+				<version>${sweble.version}</version>
+			</dependency>
+			
+			<!-- =========================================================== -->
+			<!-- Sweble Engine - Sweble Engine - Sweble Engine - Sweble Engi -->
+			<!-- =========================================================== -->
+			
+			<!-- Sweble Engine - Serialization -->
+			<dependency>
+				<groupId>org.sweble.engine</groupId>
+				<artifactId>sweble-engine-serialization</artifactId>
+				<version>${sweble.version}</version>
+			</dependency>
 
-      <!-- Utils -->
-      <dependency>
-        <groupId>de.fau.cs.osr.utils</groupId>
-        <artifactId>utils</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
-      </dependency>
+			<!-- ================================================================= -->
+			<!-- HDDiff - HDDiff - HDDiff - HDDiff - HDDiff - HDDiff - HDDiff - HD -->
+			<!-- ================================================================= -->
 
-      <!-- Sweble WOM 3.0 - SWC Adapter -->
-      <dependency>
-        <groupId>org.sweble.wom3</groupId>
-        <artifactId>sweble-wom3-swc-adapter</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
-      </dependency>
+			<!-- HDDiff -->
+			<dependency>
+				<groupId>de.fau.cs.osr.hddiff</groupId>
+				<artifactId>hddiff</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
-      <!-- Sweble Engine - Serialization -->
-      <dependency>
-        <groupId>org.sweble.engine</groupId>
-        <artifactId>sweble-engine-serialization</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
-      </dependency>
+			<!-- HDDiff - Performance Suite -->
+			<dependency>
+				<groupId>de.fau.cs.osr.hddiff</groupId>
+				<artifactId>hddiff-perfsuite</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
-      <!-- ================================================================= -->
-      <!--   HDDiff Dependencies                                             -->
-      <!-- ================================================================= -->
+			<!-- HDDiff - WOM Adapter -->
+			<dependency>
+				<groupId>de.fau.cs.osr.hddiff</groupId>
+				<artifactId>hddiff-wom-adapter</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
-      <!-- HDDiff -->
-      <dependency>
-        <groupId>de.fau.cs.osr.hddiff</groupId>
-        <artifactId>hddiff</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+		</dependencies>
+	</dependencyManagement>
 
-      <!-- HDDiff - Performance Suite -->
-      <dependency>
-        <groupId>de.fau.cs.osr.hddiff</groupId>
-        <artifactId>hddiff-perfsuite</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+	<build>
 
-      <!-- HDDiff - WOM Adapter -->
-      <dependency>
-        <groupId>de.fau.cs.osr.hddiff</groupId>
-        <artifactId>hddiff-wom-adapter</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+		<!-- =============================================================== -->
+		<!-- Plugin Management - Plugin Management - Plugin Management - Plu -->
+		<!-- =============================================================== -->
 
-    </dependencies>
-  </dependencyManagement>
+		<pluginManagement>
+			<plugins>
 
-  <build>
+				<!-- Check and format license headers -->
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<configuration>
+						<header>${hddiff-parent.etc-path}/agpl-v3-header.txt</header>
+					</configuration>
+				</plugin>
 
-    <!-- ==[ Resource Configuration ]======================================= -->
+			</plugins>
+		</pluginManagement>
+	</build>
 
-    <!--
-      see parent: <resources>
-    -->
+	<!-- =================================================================== -->
+	<!-- More Project Information - More Project Information - More Project  -->
+	<!-- =================================================================== -->
 
-    <!-- ==[ Plugin Configuration ]========================================= -->
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-    <plugins>
+	<developers>
+		<developer>
+			<id>driehle</id>
+			<name>Dirk Riehle</name>
+			<email>dirk.riehle@fau.de</email>
+			<roles>
+				<role>Director</role>
+			</roles>
+			<organization>University of Erlangen-Nürnberg - Open Source Research Group</organization>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>hdohrn</id>
+			<name>Hannes Dohrn</name>
+			<email>hannes.dohrn@fau.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>University of Erlangen-Nürnberg - Open Source Research Group</organization>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
 
-      <!-- Check and format license headers -->
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <header>${hddiff-project.etc}/license-header.txt</header>
-          <validHeaders>
-            <validHeader>${hddiff-project.etc}/license-header-no-copyright.txt</validHeader>
-          </validHeaders>
-          <strictCheck>true</strictCheck>
-          <failIfMissing>true</failIfMissing>
-          <excludes>
-            <exclude>**/.gitignore</exclude>
-            <exclude>etc/license-header.txt</exclude>
-            <exclude>etc/license-header-no-copyright.txt</exclude>
-            <exclude>LICENSE</exclude>
-            <exclude>NOTICE</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
+	<!-- =================================================================== -->
+	<!-- Environment Settings - Environment Settings - Environment Settings  -->
+	<!-- =================================================================== -->
 
-      <!-- Make Git information available as properties -->
-      <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-      </plugin>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/sweble/hddiff/issues</url>
+	</issueManagement>
 
-    </plugins>
+	<scm>
+		<connection>scm:git://git@github.com/sweble/hddiff.git</connection>
+		<developerConnection>scm:git://git@mojo-forge.cs.fau.de/sweble-public/hddiff.git</developerConnection>
+		<url>https://github.com/sweble/hddiff</url>
+		<tag>HEAD</tag>
+	</scm>
 
-    <!-- ==[ Plugin Management ]============================================ -->
-
-    <pluginManagement />
-
-    <!-- ==[ Build Element Set ]============================================ -->
-
-    <!--
-      see parent: <sourceDirectory>
-                  <scriptSourceDirectory>
-                  <testSourceDirectory>
-                  <outputDirectory>
-                  <testOutputDirectory>
-                  <extensions>
-    -->
-
-  </build>
-
-  <!-- ==[ Reporting ]====================================================== -->
-
-  <!--
-    see parent: <reporting>
-  -->
-
-  <!-- ==[ More Project Information ]======================================= -->
-
-  <licenses>
-    <license>
-      <name>GNU Affero General Public License</name>
-      <url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <!--
-    see parent: <organization>
-  -->
-
-  <developers>
-    <developer>
-      <id>driehle</id>
-      <name>Dirk Riehle</name>
-      <email>dirk.riehle@fau.de</email>
-      <roles>
-        <role>Director</role>
-      </roles>
-      <organization>University of Erlangen-Nürnberg - Open Source Research Group</organization>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>hdohrn</id>
-      <name>Hannes Dohrn</name>
-      <email>hannes.dohrn@fau.de</email>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <organization>University of Erlangen-Nürnberg - Open Source Research Group</organization>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
-
-  <contributors />
-
-  <!-- ==[ Environment Settings ]=========================================== -->
-
-  <!--
-    see parent: <issueManagement>
-                <ciManagement>
-                <mailingLists>
-  -->
-
-  <scm>
-    <connection>scm:git://sweble.org/git/hddiff-project.git</connection>
-    <developerConnection>scm:git:ssh://gitosis@sweble.org/hddiff-project.git</developerConnection>
-    <url>http://sweble.org/gitweb/?p=hddiff-project.git;a=summary</url>
-    <tag>HEAD</tag>
-  </scm>
-
-  <!--
-    see parent: <distributionManagement>
-  -->
-
-  <!-- This is needed since SNAPSHOTs wouldn't find their parent pom otherwise -->
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </snapshots>
-      <id>osr-public-repo</id>
-      <name>OSR Public Repository</name>
-      <url>http://mojo-maven.cs.fau.de/content/repositories/public</url>
-    </repository>
-  </repositories>
-
-  <!-- ==[ Profiles ]======================================================= -->
-
-  <profiles>
-  </profiles>
-
+	<!-- This is needed since SNAPSHOTs wouldn't find their parent pom otherwise -->
+	<repositories>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<id>osr-public-repo</id>
+			<name>OSR Public Repository</name>
+			<url>http://mojo-maven.cs.fau.de/content/repositories/public</url>
+		</repository>
+	</repositories>
 </project>
