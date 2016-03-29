@@ -66,6 +66,7 @@
 		<!-- Dependencies -->
 		<osr-common.version>3.0.0-SNAPSHOT</osr-common.version>
 		<sweble.version>3.0.0-SNAPSHOT</sweble.version>
+		<hddiff.version>${project.version}</hddiff.version>
 	</properties>
 
 	<!-- =================================================================== -->
@@ -141,21 +142,21 @@
 			<dependency>
 				<groupId>de.fau.cs.osr.hddiff</groupId>
 				<artifactId>hddiff</artifactId>
-				<version>${project.version}</version>
+				<version>${hddiff.version}</version>
 			</dependency>
 
 			<!-- HDDiff - Performance Suite -->
 			<dependency>
 				<groupId>de.fau.cs.osr.hddiff</groupId>
 				<artifactId>hddiff-perfsuite</artifactId>
-				<version>${project.version}</version>
+				<version>${hddiff.version}</version>
 			</dependency>
 
 			<!-- HDDiff - WOM Adapter -->
 			<dependency>
 				<groupId>de.fau.cs.osr.hddiff</groupId>
 				<artifactId>hddiff-wom-adapter</artifactId>
-				<version>${project.version}</version>
+				<version>${hddiff.version}</version>
 			</dependency>
 
 		</dependencies>
