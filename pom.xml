@@ -60,7 +60,7 @@
 		<!-- Java compiler source and target version -->
 		<maven.compiler.source>1.7</maven.compiler.source>
 
-		<!-- hddiff-parent currently does not conform :( -->
+		<!-- hddiff currently does not conform :( -->
 		<maven-checkstyle-plugin.skip>true</maven-checkstyle-plugin.skip>
 
 		<!-- Dependencies -->
