@@ -19,239 +19,246 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- Parent POM: HDDiff Development -->
+	<parent>
+		<groupId>de.fau.cs.osr.hddiff</groupId>
+		<artifactId>hddiff-parent</artifactId>
+		<version>2.0.0</version>
+	</parent>
 
-  <parent>
-    <groupId>de.fau.cs.osr.hddiff</groupId>
-    <artifactId>hddiff-project</artifactId>
-    <version>1.1.0</version>
-  </parent>
+	<artifactId>hddiff-perfsuite</artifactId>
+	<packaging>jar</packaging>
+	<name>HDDiff - Performance Suite</name>
+	<inceptionYear>2014</inceptionYear>
+	<description>HighDefinition Diff Performance Suite</description>
 
-  <!-- This POM: HDDiff - Performance Suite -->
+	<!-- =================================================================== -->
+	<!-- Properties - Properties - Properties - Properties - Properties - Pr -->
+	<!-- =================================================================== -->
 
-  <!-- Same groupId as parent -->
-  <artifactId>hddiff-perfsuite</artifactId>
-  <!-- Same version as parent -->
-  <packaging>jar</packaging>
+	<properties>
+		<hddiff-parent.path>../</hddiff-parent.path>
+	</properties>
 
-  <name>HDDiff - Performance Suite</name>
-  <url>http://sweble.org/sites/swc-devel/develop-latest/tooling/hddiff-project/hddiff-perfsuite</url>
-  <inceptionYear>2014</inceptionYear>
-  <description>HighDefinition Diff Performance Suite</description>
+	<!-- =================================================================== -->
+	<!-- Dependencies - Dependencies - Dependencies - Dependencies - Depende -->
+	<!-- =================================================================== -->
 
-  <!-- ==[ Properties ]===================================================== -->
+	<dependencies>
 
-  <properties>
+		<dependency>
+			<groupId>com.sksamuel.diff</groupId>
+			<artifactId>diff</artifactId>
+			<version>1.1.11</version>
+		</dependency>
 
-    <version.java>1.7</version.java>
+		<dependency>
+			<groupId>fc.xml.diff</groupId>
+			<artifactId>xmldiff</artifactId>
+			<version>0.14</version>
+		</dependency>
 
-    <hddiff-project.basedir>${project.parent.basedir}</hddiff-project.basedir>
+		<!-- Apache Commons -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<!-- Also add signature "commons-io-unsafe-<ver>" to forbiddenapis plugin -->
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 
-  </properties>
+		<!-- XML APIs -->
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+		</dependency>
 
-  <!-- ==[ Dependencies ]=================================================== -->
+		<!-- Gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
 
-  <dependencies>
+		<!-- Utils -->
+		<dependency>
+			<groupId>de.fau.cs.osr.utils</groupId>
+			<artifactId>utils</artifactId>
+		</dependency>
 
-    <dependency>
-      <groupId>com.sksamuel.diff</groupId>
-      <artifactId>diff</artifactId>
-      <version>1.1.11</version>
-    </dependency>
+		<!-- Sweble Wikitext Components - Engine -->
+		<dependency>
+			<groupId>org.sweble.wikitext</groupId>
+			<artifactId>swc-engine</artifactId>
+		</dependency>
 
-    <dependency>
-      <groupId>fc.xml.diff</groupId>
-      <artifactId>xmldiff</artifactId>
-      <version>0.14</version>
-    </dependency>
+		<!-- Sweble - WOM 3.0 -->
+		<dependency>
+			<groupId>org.sweble.wom3</groupId>
+			<artifactId>sweble-wom3-core</artifactId>
+		</dependency>
 
-    <!-- Gson -->
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
+		<!-- Sweble - WOM 3.0 SWC Adapter-->
+		<dependency>
+			<groupId>org.sweble.wom3</groupId>
+			<artifactId>sweble-wom3-swc-adapter</artifactId>
+		</dependency>
 
-    <!-- Sweble Engine - Serialization -->
-    <dependency>
-      <groupId>org.sweble.engine</groupId>
-      <artifactId>sweble-engine-serialization</artifactId>
-    </dependency>
+		<!-- Sweble Engine - Serialization -->
+		<dependency>
+			<groupId>org.sweble.engine</groupId>
+			<artifactId>sweble-engine-serialization</artifactId>
+		</dependency>
 
-    <!-- HDDiff WOM Adapter -->
-    <dependency>
-      <groupId>de.fau.cs.osr.hddiff</groupId>
-      <artifactId>hddiff-wom-adapter</artifactId>
-    </dependency>
+		<!-- HDDiff -->
+		<dependency>
+			<groupId>de.fau.cs.osr.hddiff</groupId>
+			<artifactId>hddiff</artifactId>
+		</dependency>
 
-    <!--
-      Testing
-    -->
+		<!-- HDDiff WOM Adapter -->
+		<dependency>
+			<groupId>de.fau.cs.osr.hddiff</groupId>
+			<artifactId>hddiff-wom-adapter</artifactId>
+		</dependency>
 
-    <!-- JUnit -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>compile</scope>
-    </dependency>
+		<!-- =============================================================== -->
+		<!-- Testing - Testing - Testing - Testing - Testing - Testing - Tes -->
+		<!-- =============================================================== -->
 
-  </dependencies>
+		<!-- JUnit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-  <!-- ==[ Dependency Management ]========================================== -->
+		<!-- Utils - Testing -->
+		<dependency>
+			<groupId>de.fau.cs.osr.utils</groupId>
+			<artifactId>utils-testing</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-  <dependencyManagement>
-  </dependencyManagement>
+	</dependencies>
 
-  <build>
+	<build>
 
-    <!-- ==[ Resource Configuration ]======================================= -->
+		<!-- =============================================================== -->
+		<!-- Plugins - Plugins - Plugins - Plugins - Plugins - Plugins - Plu -->
+		<!-- =============================================================== -->
 
-    <!--
-      see parent: <resources>
-    -->
+		<plugins>
 
-    <!-- ==[ Plugin Configuration ]========================================= -->
+			<!-- Create a JAR package -->
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>de.fau.cs.osr.hddiff.perfsuite.PerformanceSuite</mainClass>
+							<classpathPrefix>lib/</classpathPrefix>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 
-    <plugins>
+			<!-- Forbidden APIs -->
+			<plugin>
+				<groupId>de.thetaphi</groupId>
+				<artifactId>forbiddenapis</artifactId>
+				<configuration>
+					<bundledSignatures combine.children="append">
+						<bundledSignature>commons-io-unsafe-1.4</bundledSignature>
+					</bundledSignatures>
+				</configuration>
+			</plugin>
 
-      <!-- Create a JAR package -->
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>de.fau.cs.osr.hddiff.perfsuite.PerformanceSuite</mainClass>
-              <classpathPrefix>lib/</classpathPrefix>
-              <addClasspath>true</addClasspath>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
+			<!-- Maven Enforcer Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce-ban-duplicate-classes</id>
+						<configuration>
+							<rules>
+								<banDuplicateClasses>
+									<ignoreClasses>
+										<!--
+											It appears xmldiff has junit baked
+											into its .jar :(
 
-      <!-- Check and format license headers -->
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <!-- I assume the configuration is inherited from the parent -->
-          <excludes>
-            <!-- These excludes should be the same as in the parent project -->
-            <exclude>**/*.log</exclude>
-            <exclude>**/.gitignore</exclude>
-            <exclude>LICENSE</exclude>
-            <exclude>NOTICE</exclude>
+											junit:junit:jar:4.12:test
+											fc.xml.diff:xmldiff:jar:0.14:compile
+										-->
+										<ignoreClass>junit.**</ignoreClass>
+									</ignoreClasses>
+								</banDuplicateClasses>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-            <!-- Extra excludes for this project -->
-            <exclude>src/test/resources/nopkg-wikidiff/*.wikitext</exclude>
-            <exclude>src/test/resources/nopkg-wikidiff/NOTICE</exclude>
-            <exclude>README.md</exclude>
-            <exclude>.README.md.html</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
+			<!-- Check and format license headers -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<excludes combine.children="append">
+						<exclude>src/test/resources/nopkg-wikidiff/*.wikitext</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 
-    </plugins>
+		</plugins>
 
-    <!-- ==[ Plugin Management ]============================================ -->
+	</build>
 
-    <pluginManagement>
-    </pluginManagement>
+	<!-- =================================================================== -->
+	<!-- Profiles - Profiles - Profiles - Profiles - Profiles - Profiles - P -->
+	<!-- =================================================================== -->
 
-    <!-- ==[ Build Element Set ]============================================ -->
+	<profiles>
 
-    <!--
-      see parent: <sourceDirectory>
-                  <scriptSourceDirectory>
-                  <testSourceDirectory>
-                  <outputDirectory>
-                  <testOutputDirectory>
-                  <extensions>
-    -->
+		<profile>
+			<id>build-aggregates</id>
+			<build>
+				<plugins>
 
-  </build>
+					<!-- Generate Jar with dependencies -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<inherited>false</inherited>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<archive>
+								<manifest>
+									<mainClass>de.fau.cs.osr.hddiff.perfsuite.PerformanceSuite</mainClass>
+								</manifest>
+							</archive>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-  <!-- ==[ Reporting ]====================================================== -->
+				</plugins>
+			</build>
+		</profile>
 
-  <!--
-    see parent: <reporting>
-  -->
-
-  <!-- ==[ More Project Information ]======================================= -->
-
-  <licenses>
-    <license>
-      <name>GNU Affero General Public License</name>
-      <url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <!--
-    see parent: <organization>
-                <developers>
-                <contributors>
-  -->
-
-  <!-- ==[ Environment Settings ]=========================================== -->
-
-  <!--
-    see parent: <issueManagement>
-                <ciManagement>
-                <mailingLists>
-  -->
-
-  <scm>
-    <connection>scm:git://sweble.org/git/hddiff-project.git</connection>
-    <developerConnection>scm:git:ssh://gitosis@sweble.org/hddiff-project.git</developerConnection>
-    <url>http://sweble.org/gitweb/?p=hddiff-project.git;a=summary</url>
-    <tag>hddiff-project-1.1.0</tag>
-  </scm>
-
-  <!--
-    see parent: <distributionManagement>
-                <repositories>
-                <pluginRepositories>
-  -->
-
-  <!-- ==[ Profiles ]======================================================= -->
-
-  <profiles>
-
-    <profile>
-      <id>build-aggregates</id>
-      <build>
-        <plugins>
-
-          <!-- Generate Jar with dependencies -->
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <inherited>false</inherited>
-            <configuration>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <archive>
-                <manifest>
-                  <mainClass>de.fau.cs.osr.hddiff.perfsuite.PerformanceSuite</mainClass>
-                </manifest>
-              </archive>
-            </configuration>
-            <executions>
-              <execution>
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-        </plugins>
-      </build>
-    </profile>
-
-  </profiles>
-
+	</profiles>
 </project>

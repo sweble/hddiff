@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.fau.cs.osr.hddiff.editscript.EditOp;
 import de.fau.cs.osr.utils.NamedParametrized;
 import de.fau.cs.osr.utils.SimpleConsoleOutput;
 import de.fau.cs.osr.utils.TestResourcesFixture;
@@ -38,26 +37,26 @@ import de.fau.cs.osr.utils.TestResourcesFixture;
 public class HDDiffTest
 {
 	private static final String FILTER_RX = ".*?\\.a\\.wikitext";
-	
+
 	private static final String INPUT_SUB_DIR = "nopkg-wikidiff";
-	
+
 	// =========================================================================
-	
+
 	@Parameters
 	public static List<Object[]> enumerateInputs() throws Exception
 	{
 		return HDDiffTestUtils.getTestResourcesFixture()
 				.gatherAsParameters(INPUT_SUB_DIR, FILTER_RX, false);
 	}
-	
+
 	// =========================================================================
-	
+
 	private final HDDiffTestUtils utils = new HDDiffTestUtils();
-	
+
 	private final File inputFile;
-	
+
 	// =========================================================================
-	
+
 	public HDDiffTest(
 			String title,
 			TestResourcesFixture resources,
@@ -65,16 +64,16 @@ public class HDDiffTest
 	{
 		this.inputFile = inputFile;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Test
 	public void testFindAGoodNameForThisTest() throws Exception
 	{
 		// TODO: Do some actual testing...
 		SimpleConsoleOutput.printBigSep(inputFile.toString());
-		List<EditOp> es = utils.generateAndApplyDiff(inputFile, INPUT_SUB_DIR);
-		
+		/*List<EditOp> es = */utils.generateAndApplyDiff(inputFile, INPUT_SUB_DIR);
+
 		// ...
 	}
 }

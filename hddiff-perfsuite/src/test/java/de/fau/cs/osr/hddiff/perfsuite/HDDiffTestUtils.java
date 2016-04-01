@@ -51,83 +51,83 @@ public class HDDiffTestUtils
 	{
 		File path = TestResourcesFixture.resourceNameToFile(
 				HDDiffTestUtils.class, "/");
-		
+
 		return new TestResourcesFixture(path);
 	}
-	
+
 	// =========================================================================
-	
+
 	private final WtWom3Toolbox wtWom3Toolbox;
-	
+
 	// =========================================================================
-	
+
 	protected HDDiffTestUtils()
 	{
 		wtWom3Toolbox = new WtWom3Toolbox();
-		
+
 		// For testing we don't want stuff to be removed
 		getWtWom3Toolbox().getWikiConfig().getEngineConfig()
 				.setTrimTransparentBeforeParsing(false);
 	}
-	
+
 	// =========================================================================
-	
+
 	public WtWom3Toolbox getWtWom3Toolbox()
 	{
 		return wtWom3Toolbox;
 	}
-	
+
 	// =========================================================================
-	
+
 	public List<EditOp> generateDiff(
 			File inputFileA,
 			String inputSubDir) throws Exception
 	{
 		ExpansionCallback callback = new TestExpansionCallback();
-		
+
 		Wom3Document womA = parse(inputFileA, callback);
-		
+
 		File inputFileB = aToB(inputFileA);
 		Wom3Document womB = parse(inputFileB, callback);
-		
+
 		return generateDiff(womA, womB, inputFileA.getName());
 	}
-	
+
 	public List<EditOp> generateAndApplyDiff(
 			File inputFileA,
 			String inputSubDir) throws Exception
 	{
 		ExpansionCallback callback = new TestExpansionCallback();
-		
+
 		Wom3Document womA = parse(inputFileA, callback);
-		
+
 		File inputFileB = aToB(inputFileA);
 		Wom3Document womB = parse(inputFileB, callback);
-		
+
 		return generateAndApplyDiff(womA, womB, inputFileA.getName());
 	}
-	
+
 	public Wom3Document parse(File inputFile, ExpansionCallback callback) throws Exception
 	{
 		String fileTitle = FilenameUtils.getBaseName(inputFile.getName());
-		
+
 		PageId pageId = getWtWom3Toolbox().makePageId(fileTitle);
-		
-		Wom3Document wom = getWtWom3Toolbox().wmToWom(inputFile, pageId, callback).womDoc;
-		
+
+		Wom3Document wom = getWtWom3Toolbox().wmToWom(inputFile, pageId, callback, "UTF8").womDoc;
+
 		// We will modify this document in possibly illegal ways later
 		wom.setStrictErrorChecking(false);
-		
+
 		return wom;
 	}
-	
+
 	protected static File aToB(File inputFileA)
 	{
 		return new File(inputFileA.getPath().replaceAll(
 				"\\.a\\.wikitext$",
 				".b.wikitext"));
 	}
-	
+
 	protected static List<EditOp> generateAndApplyDiff(
 			Wom3Document womA,
 			Wom3Document womB,
@@ -135,23 +135,23 @@ public class HDDiffTestUtils
 	{
 		HDDiffOptions options = setupHDDiff();
 		options.setDumpTreesFileTitle(title);
-		
+
 		ReportItem report = new ReportItem();
 		try
 		{
 			Wom3Node rootA = (Wom3Node) womA.getDocumentElement();
 			Wom3Node rootB = (Wom3Node) womB.getDocumentElement();
-			
+
 			DiffNode root1 = WomToDiffNodeConverter.preprocess(rootA);
 			DiffNode root2 = WomToDiffNodeConverter.preprocess(rootB);
-			
+
 			List<EditOp> es = HDDiff.editScript(root1, root2, options, report);
 			System.out.println(new EditScriptAnalysis(es).toShortString());
-			
+
 			applyEditScript(es);
-			
+
 			root1.compareNativeDeep(root2);
-			
+
 			return es;
 		}
 		finally
@@ -159,7 +159,7 @@ public class HDDiffTestUtils
 			System.out.println(report.toString());
 		}
 	}
-	
+
 	protected static List<EditOp> generateDiff(
 			Wom3Document womA,
 			Wom3Document womB,
@@ -167,36 +167,36 @@ public class HDDiffTestUtils
 	{
 		HDDiffOptions options = setupHDDiff();
 		options.setDumpTreesFileTitle(title);
-		
+
 		Wom3Node rootA = (Wom3Node) womA.getDocumentElement();
 		Wom3Node rootB = (Wom3Node) womB.getDocumentElement();
-		
+
 		DiffNode root1 = WomToDiffNodeConverter.preprocess(rootA);
 		DiffNode root2 = WomToDiffNodeConverter.preprocess(rootB);
-		
+
 		return HDDiff.editScript(root1, root2, options, null);
 	}
-	
+
 	protected static HDDiffOptions setupHDDiff()
 	{
 		HDDiffOptions options = new HDDiffOptions();
-		
+
 		options.setNodeMetrics(new WomNodeMetrics());
-		
+
 		options.setMinSubtreeWeight(12);
-		
+
 		options.setEnableTnsm(true);
 		options.setTnsmEligibilityTester(new WomNodeEligibilityTester());
 		options.setTnsmSubstringJudge(new WordSubstringJudge(8, 3));
-		
+
 		return options;
 	}
-	
+
 	protected static void applyEditScript(List<EditOp> es)
 	{
 		new EditScriptManager(es).apply();
 	}
-	
+
 	protected static PageRevDiffNode makePageRevDiffNode(
 			File inputFileA,
 			DiffNode root1,

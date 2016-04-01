@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.fau.cs.osr.hddiff.utils.ReportItem.Indicator;
 import de.fau.cs.osr.hddiff.utils.ReportItem.IndicatorNumber;

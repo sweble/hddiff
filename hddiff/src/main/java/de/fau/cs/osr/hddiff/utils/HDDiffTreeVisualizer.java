@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import de.fau.cs.osr.hddiff.HDDiffOptions;
 import de.fau.cs.osr.hddiff.tree.DiffNode;
