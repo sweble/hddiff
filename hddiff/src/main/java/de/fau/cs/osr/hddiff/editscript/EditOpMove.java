@@ -91,10 +91,10 @@ public class EditOpMove
 	public String toString()
 	{
 		return String.format("" +
-				"DiffNodeEditOpInsert:\n" +
+				"DiffNodeEditOpMove:\n" +
 				"  finalPosition = %d\n" +
-				"  insertedNode:\n%s\n" +
-				"  parent:\n%s\n",
+				"  movedNode:\n%s\n" +
+				"  toParent:\n%s\n",
 				finalPosition,
 				StringTools.indent(movedNode.toString(), "    "),
 				StringTools.indent(toParent.toString(), "    "));
