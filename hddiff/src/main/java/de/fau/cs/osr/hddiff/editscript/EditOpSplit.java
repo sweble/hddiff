@@ -20,39 +20,23 @@ package de.fau.cs.osr.hddiff.editscript;
 import de.fau.cs.osr.hddiff.tree.DiffNode;
 import de.fau.cs.osr.utils.StringTools;
 
-/**
- * A node was found in the right tree whose parent does not match the respective
- * parent node of the node's partner in the left tree. The move operation
- * describes how to transform the left tree so that it is equal to the right
- * tree.
- */
-public class EditOpMove
+public class EditOpSplit
 		implements
 			EditOp
 {
-	private final DiffNode movedNode;
+	private final DiffNode splitNode;
 
-	private final DiffNode toParent;
+	private final int splitPos;
 
-	private final int finalPosition;
-
-	/**
-	 * Additional information: The node in the right tree after the move.
-	 */
-	private final DiffNode movedNodeRight;
+	private final DiffNode otherHalf;
 
 	// =========================================================================
 
-	public EditOpMove(
-			DiffNode movedNode,
-			DiffNode toParent,
-			DiffNode movedNodeRight,
-			int finalPosition)
+	public EditOpSplit(DiffNode node, int pos, DiffNode otherHalf)
 	{
-		this.movedNode = movedNode;
-		this.toParent = toParent;
-		this.movedNodeRight = movedNodeRight;
-		this.finalPosition = finalPosition;
+		this.splitNode = node;
+		this.splitPos = pos;
+		this.otherHalf = otherHalf;
 	}
 
 	// =========================================================================
@@ -60,29 +44,24 @@ public class EditOpMove
 	@Override
 	public Operation getType()
 	{
-		return Operation.MOVE;
+		return Operation.SPLIT;
 	}
 
 	// =========================================================================
 
-	public DiffNode getMovedNode()
+	public DiffNode getSplitNode()
 	{
-		return movedNode;
+		return splitNode;
 	}
 
-	public DiffNode getToParent()
+	public int getSplitPos()
 	{
-		return toParent;
+		return splitPos;
 	}
 
-	public int getFinalPosition()
+	public DiffNode getOtherHalf()
 	{
-		return finalPosition;
-	}
-
-	public DiffNode getMovedNodeRight()
-	{
-		return movedNodeRight;
+		return otherHalf;
 	}
 
 	// =========================================================================
@@ -91,12 +70,12 @@ public class EditOpMove
 	public String toString()
 	{
 		return String.format("" +
-				"DiffNodeEditOpMove:\n" +
-				"  finalPosition = %d\n" +
-				"  movedNode:\n%s\n" +
-				"  toParent:\n%s\n",
-				finalPosition,
-				StringTools.indent(movedNode.toString(), "    "),
-				StringTools.indent(toParent.toString(), "    "));
+				"DiffNodeEditOpSplit:\n" +
+				"  splitNode:\n%s\n" +
+				"  splitPos = %d\n" +
+				"  otherHalf:\n%s\n",
+				StringTools.indent(splitNode.toString(), "    "),
+				splitPos,
+				StringTools.indent(otherHalf.toString(), "    "));
 	}
 }

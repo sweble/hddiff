@@ -24,8 +24,9 @@ public interface EditOp
 		UPDATE,
 		INSERT,
 		MOVE,
-		DELETE
+		DELETE,
+		SPLIT,
 	}
-	
+
 	Operation getType();
 }

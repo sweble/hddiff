@@ -32,6 +32,7 @@ import de.fau.cs.osr.hddiff.editscript.EditOp;
 import de.fau.cs.osr.hddiff.editscript.EditOpDelete;
 import de.fau.cs.osr.hddiff.editscript.EditOpInsert;
 import de.fau.cs.osr.hddiff.editscript.EditOpMove;
+import de.fau.cs.osr.hddiff.editscript.EditOpSplit;
 import de.fau.cs.osr.hddiff.editscript.EditOpUpdate;
 import de.fau.cs.osr.hddiff.tree.DiffNode;
 import de.fau.cs.osr.hddiff.tree.NodeEligibilityTesterInterface;
@@ -48,15 +49,15 @@ import de.fau.cs.osr.utils.ComparisonException;
 public class HDDiff
 {
 	private static final int NODE_COUNT_ASSUMPTION = 1000;
-	
+
 	private static final Object DUPLICATE_INDICATOR_1 = new Object();
-	
+
 	private static final SubtreeMatch DUPLICATE_INDICATOR_2 = new SubtreeMatch(null, null, Integer.MIN_VALUE);
-	
+
 	private static final boolean ASSERTIONS = true;
-	
+
 	// =========================================================================
-	
+
 	public static List<EditOp> editScript(
 			DiffNode root1,
 			DiffNode root2,
@@ -64,7 +65,7 @@ public class HDDiff
 	{
 		return new HDDiff(root1, root2, options, null).editScript();
 	}
-	
+
 	public static List<EditOp> editScript(
 			DiffNode root1,
 			DiffNode root2,
@@ -73,120 +74,120 @@ public class HDDiff
 	{
 		return new HDDiff(root1, root2, options, report).editScript();
 	}
-	
+
 	// =========================================================================
-	
+
 	private final DiffNode root1;
-	
+
 	private final DiffNode root2;
-	
+
 	private final HDDiffOptions options;
-	
+
 	private final ReportItem report;
-	
+
 	private final NodeMetricsInterface nodeMetrics;
-	
+
 	private final int minSubtreeWeight;
-	
+
 	// =========================================================================
 	// Precomputation & Subtree matching
-	
+
 	private boolean precomputeT1;
-	
+
 	private Map<Integer, Object> subtreeHashes1;
-	
+
 	private Map<Integer, SubtreeMatch> subtreeHashes2;
-	
+
 	// =========================================================================
 	// STATS: Precomputation & Subtree matching
-	
+
 	private int nodeCount1;
-	
+
 	private int nodeCount2;
-	
+
 	private int leafCount1;
-	
+
 	private int leafCount2;
-	
+
 	private int textLength1;
-	
+
 	private int textLength2;
-	
+
 	private int ssrSuitableSubtreeCount1;
-	
+
 	private int ssrSuitableSubtreeCount2;
-	
+
 	private int ssrSubtreeMatchCount;
-	
+
 	private int ssrSubtreeNodeMatchCount;
-	
+
 	// =========================================================================
 	// TSNM matching
-	
+
 	private ArrayList<DiffNode> leafSeq1;
-	
+
 	private ArrayList<DiffNode> leafSeq2;
-	
+
 	// DEBUG
 	private int splitMatchId = 0;
-	
+
 	// =========================================================================
 	// STATS: TSNM matching
-	
+
 	private int nocssNodeMatchCount;
-	
+
 	private int nocssNodeSplitCount;
-	
+
 	// =========================================================================
 	// Bottom Up Top Down pass
-	
+
 	private final Candidate searchCandidate = new Candidate(null, null, -1);
-	
+
 	private Map<Candidate, Candidate> ancestorCandidates;
-	
+
 	// =========================================================================
 	// STATS: Bottom Up Top Down pass
-	
+
 	private int bottomUpAncestorMatchCount;
-	
+
 	private LcsMyers<DiffNode> pathTypeLcs;
-	
+
 	// =========================================================================
 	// Top Down pass
-	
+
 	private ArrayList<DiffNode> siblingSeq1;
-	
+
 	private ArrayList<DiffNode> siblingSeq2;
-	
+
 	private LcsMyers<DiffNode> childHashLcs;
-	
+
 	private LcsMyers<DiffNode> siblingTypeLcs;
-	
+
 	// =========================================================================
 	// STATS: Top Down pass
-	
+
 	private int t2ttdSubtreeMatchCount;
-	
+
 	private int t2ttdSubtreeNodeMatchCount;
-	
+
 	private int t2ttdChildLabelNodeMatchCount;
-	
+
 	private int editScriptUpdateCount;
-	
+
 	private int editScriptMoveCount;
-	
+
 	private int editScriptInsertCount;
-	
+
 	private int editScriptAlignmentCount;
-	
+
 	private int editScriptDeleteCount;
-	
+
 	// =========================================================================
-	
+
 	private LinkedList<EditOp> editScript;
-	
+
 	// =========================================================================
-	
+
 	public HDDiff(
 			DiffNode root1,
 			DiffNode root2,
@@ -197,7 +198,7 @@ public class HDDiff
 			throw new IllegalArgumentException("We assume that the root "
 					+ "nodes always match. Therefore, the root nodes must be "
 					+ "of the same kind!");
-		
+
 		this.root1 = root1;
 		this.root2 = root2;
 		this.options = options;
@@ -205,36 +206,36 @@ public class HDDiff
 		this.minSubtreeWeight = options.getMinSubtreeWeight();
 		this.report = report;
 	}
-	
+
 	// =========================================================================
-	
+
 	public List<EditOp> editScript()
 	{
 		Timer timer = null;
 		if (report != null)
 			timer = report.startTimer("00) HDDiff");
-		
+
 		editScript = new LinkedList<>();
-		
+
 		try
 		{
 			precompute();
-			
+
 			if (options.getDumpTreesPhase() == TreeDumpPhases.AFTER_PRECOMPUTE)
 				HDDiffTreeVisualizer.drawGraph(options, root1, root2);
-			
+
 			boolean complete = false;
 			complete = greedySubtreeMatching();
-			
+
 			if (complete)
 			{
 				// Also checks for updates
 				ssrMapSubtrees(root1, root2);
 			}
-			
+
 			if (options.getDumpTreesPhase() == TreeDumpPhases.AFTER_SSR)
 				HDDiffTreeVisualizer.drawGraph(options, root1, root2);
-			
+
 			if (!complete)
 			{
 				/**
@@ -244,26 +245,26 @@ public class HDDiff
 				 * operation will be added to the edit script laters.
 				 */
 				mapFull(root1, root2);
-				
+
 				if (options.isTnsmEnabled())
 					textNodeSplitMatching();
-				
+
 				if (options.getDumpTreesPhase() == TreeDumpPhases.AFTER_TNSM)
 					HDDiffTreeVisualizer.drawGraph(options, root1, root2);
-				
+
 				if (!options.isOnlySplitNodes())
 				{
 					bottomUpMatching();
-					
+
 					if (options.getDumpTreesPhase() == TreeDumpPhases.AFTER_TREE2TREE_BOTTOMUP)
 						HDDiffTreeVisualizer.drawGraph(options, root1, root2);
-					
+
 					// Also builds edit script
 					topDownMatching();
-					
+
 					if (options.getDumpTreesPhase() == TreeDumpPhases.AFTER_TREE2TREE_TOPDOWN)
 						HDDiffTreeVisualizer.drawGraph(options, root1, root2);
-					
+
 					gatherDeletes();
 				}
 			}
@@ -273,33 +274,33 @@ public class HDDiff
 			if (timer != null)
 				timer.stop();
 		}
-		
+
 		return editScript;
 	}
-	
+
 	// =========================================================================
-	
+
 	private void precompute()
 	{
 		precomputationWalk();
 	}
-	
+
 	private void precomputationWalk()
 	{
 		Timer timer = null;
 		if (report != null)
 			timer = report.startTimer("00.01) Precomputation");
-		
+
 		try
 		{
 			// Do T1
 			{
 				leafSeq1 = new ArrayList<>(NODE_COUNT_ASSUMPTION);
 				subtreeHashes1 = new HashMap<>(NODE_COUNT_ASSUMPTION);
-				
+
 				precomputeT1 = true;
 				precompute(root1);
-				
+
 				if (report != null)
 				{
 					report.recordFigure("00.01.a) PRECOMP: Nodes in T1", nodeCount1, "#");
@@ -308,7 +309,7 @@ public class HDDiff
 					report.recordFigure("00.01.d) PRECOMP: Text length in T1", textLength1, "#");
 				}
 			}
-			
+
 			// Do T2
 			{
 				/**
@@ -319,14 +320,14 @@ public class HDDiff
 				int initialCapacity = (int) (nodeCount1 * 1.2f);
 				leafSeq2 = new ArrayList<>(initialCapacity);
 				subtreeHashes2 = new HashMap<>(initialCapacity);
-				
+
 				// Make sure subtreeHashes1 is not written for T2
 				Map<Integer, Object> subtreeHashes1tmp = subtreeHashes1;
 				subtreeHashes1 = null;
-				
+
 				precomputeT1 = false;
 				precompute(root2);
-				
+
 				if (report != null)
 				{
 					report.recordFigure("00.01.a) PRECOMP: Nodes in T2", nodeCount2, "#");
@@ -334,7 +335,7 @@ public class HDDiff
 					report.recordFigure("00.01.c) PRECOMP: Inner nodes in T2", nodeCount2 - leafCount2, "#");
 					report.recordFigure("00.01.d) PRECOMP: Text length in T2", textLength2, "#");
 				}
-				
+
 				subtreeHashes1 = subtreeHashes1tmp;
 			}
 		}
@@ -344,7 +345,7 @@ public class HDDiff
 				timer.stop();
 		}
 	}
-	
+
 	private void precompute(DiffNode node)
 	{
 		DiffNode child = node.getFirstChild();
@@ -364,11 +365,11 @@ public class HDDiff
 				leafSeq2.add(node);
 			else if (leafSeq1 != null)
 				leafSeq1.add(node);
-			
+
 			int textSize = 0;
 			if (node.isTextLeaf())
 				textSize = node.getTextContent().length();
-			
+
 			if (precomputeT1)
 			{
 				textLength1 += textSize;
@@ -380,26 +381,26 @@ public class HDDiff
 				++leafCount2;
 			}
 		}
-		
+
 		// post-order visit
-		
+
 		DiffNode parent = node.getParent();
-		
+
 		int newWeight = node.addWeight(nodeMetrics.computeWeight(node));
 		int newHash = node.updateSubtreeHash(nodeMetrics.computeHash(node));
-		
+
 		if (parent != null)
 		{
 			parent.addWeight(newWeight);
 			parent.updateSubtreeHash(31 * newHash);
 		}
-		
+
 		if ((subtreeHashes1 != null) &&
 				(newWeight >= minSubtreeWeight))
 		{
 			Object old = subtreeHashes1.put(newHash, node);
 			++ssrSuitableSubtreeCount1;
-			
+
 			/**
 			 * There's a possibility of hash collisions here. But checking the
 			 * suspected subtrees for real equality is too expensive. It would
@@ -413,32 +414,32 @@ public class HDDiff
 			{
 				if (isWarningEnabled())
 					report.warn("00.01) SSR: Subtree hash collision in T1!");
-				
+
 				subtreeHashes1.put(newHash, DUPLICATE_INDICATOR_1);
 			}
 		}
-		
+
 		if (precomputeT1)
 			++nodeCount1;
 		else
 			++nodeCount2;
 	}
-	
+
 	// =========================================================================
-	
+
 	private boolean greedySubtreeMatching()
 	{
 		Timer timer = null;
 		if (report != null)
 			timer = report.startTimer("00.02) Greedy subtree matching");
-		
+
 		try
 		{
 			{
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.02.01) SSR: Matching subtrees in T2");
-				
+
 				try
 				{
 					if (matchSubtreesInT2(root2))
@@ -451,17 +452,17 @@ public class HDDiff
 						timer2.stop();
 				}
 			}
-			
+
 			{
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.02.02) SSR: Mapping matched subtrees");
-				
+
 				try
 				{
 					SubtreeMatch[] n2sorted = subtreeHashes2.values().toArray(
 							new SubtreeMatch[subtreeHashes2.size()]);
-					
+
 					Arrays.sort(n2sorted);
 					mapAllSubtrees(n2sorted);
 					return false;
@@ -478,12 +479,12 @@ public class HDDiff
 			// Now garbage
 			subtreeHashes1 = null;
 			subtreeHashes2 = null;
-			
+
 			if (timer != null)
 				timer.stop();
 		}
 	}
-	
+
 	private boolean matchSubtreesInT2(DiffNode n2)
 	{
 		// No point in checking for match or descending further if weight of 
@@ -492,21 +493,21 @@ public class HDDiff
 		if (weight >= minSubtreeWeight)
 		{
 			boolean descend;
-			
+
 			++ssrSuitableSubtreeCount2;
-			
+
 			int hash = n2.getSubtreeHash();
 			Object partnerObj = subtreeHashes1.get(hash);
 			if ((partnerObj != null) && (partnerObj != DUPLICATE_INDICATOR_1))
 			{
 				DiffNode n1 = (DiffNode) partnerObj;
-				
+
 				if ((n1 == root1) || (n2 == root2))
 				{
 					boolean identical = ((n1 == root1) && (n2 == root2));
 					if (identical)
 						return true;
-					
+
 					/**
 					 * We cannot match one root to anything else but the other
 					 * root. If a root matches some subtree we have to ignore
@@ -519,7 +520,7 @@ public class HDDiff
 					SubtreeMatch old2 = subtreeHashes2.put(
 							hash,
 							new SubtreeMatch(n1, n2, weight));
-					
+
 					/**
 					 * There's a possibility of hash collisions here. But
 					 * checking the suspected subtrees for real equality is too
@@ -534,10 +535,10 @@ public class HDDiff
 					{
 						if (isWarningEnabled())
 							report.warn("00.02.01) SSR: Subtree hash collision in T2!");
-						
+
 						subtreeHashes2.put(hash, DUPLICATE_INDICATOR_2);
 					}
-					
+
 					/**
 					 * Something matched, either a duplicate or a real match. In
 					 * neither case should we descend. Either all children are
@@ -551,17 +552,17 @@ public class HDDiff
 			}
 			else
 				descend = true;
-			
+
 			if (descend)
 			{
 				for (DiffNode c2 = n2.getFirstChild(); c2 != null; c2 = c2.getNextSibling())
 					matchSubtreesInT2(c2);
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	private void mapAllSubtrees(SubtreeMatch[] n2sorted)
 	{
 		for (int i = 0; i < n2sorted.length; ++i)
@@ -570,18 +571,18 @@ public class HDDiff
 			if (match == DUPLICATE_INDICATOR_2)
 				// Due to the sorting only duplicates can follow.
 				break;
-			
+
 			DiffNode n1 = match.n1;
 			DiffNode n2 = match.n2;
-			
+
 			// Subtree is subtree of an already matched subtree.
 			// TODO: Can that even happen?
 			if (isMatched(n1) || isMatched(n2))
 				continue;
-			
+
 			ssrMapSubtrees(n1, n2);
 		}
-		
+
 		if (report != null)
 		{
 			report.recordFigure("00.02.a) SSR: Suitable subtrees in T1", ssrSuitableSubtreeCount1, "#");
@@ -590,7 +591,7 @@ public class HDDiff
 			report.recordFigure("00.02.c) SSR: nodes matched", ssrSubtreeNodeMatchCount, "#");
 		}
 	}
-	
+
 	private void ssrMapSubtrees(DiffNode n1, DiffNode n2)
 	{
 		int nodesMatched = mapSubtrees(n1, n2);
@@ -600,19 +601,19 @@ public class HDDiff
 			++ssrSubtreeMatchCount;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private void textNodeSplitMatching()
 	{
 		Timer timer = null;
 		if (report != null)
 			timer = report.startTimer("00.03) Text node splitting & matching");
-		
+
 		try
 		{
 			NodeEligibilityTesterInterface tester = options.getTnsmEligibilityTester();
-			
+
 			String str1;
 			String str2;
 			ArrayList<NodeCharPos> nodeMap1 = new ArrayList<>(textLength1);
@@ -621,13 +622,13 @@ public class HDDiff
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.03.01) TNSM: Building leaf strings");
-				
+
 				try
 				{
 					str1 = unmatchedLeafString(true, tester, leafSeq1, nodeMap1);
 					if (nodeMap1.isEmpty() || str1.isEmpty())
 						return;
-					
+
 					str2 = unmatchedLeafString(false, tester, leafSeq2, nodeMap2);
 					if (nodeMap2.isEmpty() || str2.isEmpty())
 						return;
@@ -638,19 +639,19 @@ public class HDDiff
 						timer2.stop();
 				}
 			}
-			
+
 			if (report != null)
 			{
 				report.recordFigure("00.03.01.a) TNSM: Leaf string length in T1", str1.length(), "#chr");
 				report.recordFigure("00.03.01.b) TNSM: Leaf string length in T2", str2.length(), "#chr");
 			}
-			
+
 			List<CommonSubstring> nocss;
 			{
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.03.02) TNSM: NOCSS computation");
-				
+
 				try
 				{
 					nocss = NOCSstr.compute(
@@ -666,16 +667,16 @@ public class HDDiff
 						timer2.stop();
 				}
 			}
-			
+
 			if (report != null)
 				report.recordFigure("00.03.02.a) TNSM: Number of NOCSS", nocss.size(), "#");
-			
+
 			if (!nocss.isEmpty())
 			{
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.03.03) TNSM: Node splitting");
-				
+
 				try
 				{
 					int nocssCount = nocss.size();
@@ -686,10 +687,10 @@ public class HDDiff
 						report.recordFigure("00.03.03.a) TNSM: Max NOCS length", maxNocsLen, "#chr");
 						report.recordFigure("00.03.03.c) TNSM: Min NOCS length", minNocsLen, "#chr");
 					}
-					
+
 					for (CommonSubstring nocs : nocss)
 						splitMatchedTexts(str1, str2, nodeMap1, nodeMap2, nocs);
-					
+
 					if (report != null)
 					{
 						report.recordFigure("00.03.a) TNSM: nodes matched", nocssNodeMatchCount, "#");
@@ -707,12 +708,12 @@ public class HDDiff
 		{
 			leafSeq1 = null;
 			leafSeq2 = null;
-			
+
 			if (timer != null)
 				timer.stop();
 		}
 	}
-	
+
 	private String unmatchedLeafString(
 			boolean left,
 			NodeEligibilityTesterInterface tester,
@@ -720,7 +721,7 @@ public class HDDiff
 			ArrayList<NodeCharPos> nodeCharPos)
 	{
 		int nodeCounter = 0;
-		
+
 		boolean hadSep = false;
 		StringBuilder sb = new StringBuilder(left ? textLength1 : textLength2);
 		for (DiffNode node : seq)
@@ -750,19 +751,19 @@ public class HDDiff
 				}
 			}
 		}
-		
+
 		String result = sb.toString();
-		
+
 		if (isDebugEnabled())
 			report.debug(
 					"00.03.01) TNSM: Created leaf string from %d nodes of length %d: '%s'",
 					nodeCounter,
 					result.length(),
 					abbreviateRep(result));
-		
+
 		return result;
 	}
-	
+
 	private void splitMatchedTexts(
 			String str1,
 			String str2,
@@ -771,64 +772,65 @@ public class HDDiff
 			CommonSubstring nocs)
 	{
 		boolean addSplitIds = options.isAddSplitIds();
-		
+		boolean recordSplitOps = options.isRecordSplitOps();
+
 		int start1 = nocs.start1;
 		int start2 = nocs.start2;
 		int len = nocs.len;
-		
+
 		int splitCounter = 0;
 		int matchCounter = 0;
-		
+
 		NodeCharPos lastNcp1 = (start1 > 0) ? nodeMap1.get(start1 - 1) : null;
 		NodeCharPos lastNcp2 = (start2 > 0) ? nodeMap2.get(start2 - 1) : null;
-		
+
 		NodeCharPos ncp1 = nodeMap1.get(start1);
 		NodeCharPos ncp2 = nodeMap2.get(start2);
-		
+
 		DiffNode curNode1 = ncp1.node;
 		int curNode1PosCorrect = 0;
-		
+
 		// We have to split if we don't start at node boundary
 		DiffNode startSplit1 = null;
 		if ((lastNcp1 != null) && (lastNcp1.node == ncp1.node))
 		{
-			startSplit1 = curNode1 = ncp1.node.splitText(ncp1.pos);
+			startSplit1 = curNode1 = splitText(ncp1.node, ncp1.pos, recordSplitOps);
 			ncp1.node.setWeight(nodeMetrics.computeWeight(ncp1.node));
 			ncp1.node.setSplit(true);
 			curNode1PosCorrect = ncp1.pos;
 			++splitCounter;
 			++nocssNodeSplitCount;
 		}
-		
+
 		DiffNode curNode2 = ncp2.node;
 		int curNode2PosCorrect = 0;
-		
+
 		DiffNode startSplit2 = null;
 		if ((lastNcp2 != null) && (lastNcp2.node == ncp2.node))
 		{
-			startSplit2 = curNode2 = ncp2.node.splitText(ncp2.pos);
+			startSplit2 = curNode2 = splitText(ncp2.node, ncp2.pos, false/*recordSplitOps*/);
 			ncp2.node.setWeight(nodeMetrics.computeWeight(ncp2.node));
 			ncp2.node.setSplit(true);
 			curNode2PosCorrect = ncp2.pos;
 			++splitCounter;
 			++nocssNodeSplitCount;
 		}
-		
+
 		for (int i = 1; i <= len; ++i)
 		{
 			lastNcp1 = ncp1;
 			lastNcp2 = ncp2;
-			
+
 			// Binary search for break
 			i = binarySearchBreak(nodeMap1, nodeMap2, lastNcp1, lastNcp2, start1, start2, i, len);
-			
+
 			if (addSplitIds)
 			{
 				curNode1.setNativeId("MATCH-" + splitMatchId);
 				curNode2.setNativeId("MATCH-" + splitMatchId);
 				++splitMatchId;
 			}
-			
+
 			boolean break1;
 			boolean break2;
 			boolean endNocs = (i >= len);
@@ -848,10 +850,10 @@ public class HDDiff
 				break1 = (ncp1 != null) && (lastNcp1.node == ncp1.node);
 				break2 = (ncp2 != null) && (lastNcp2.node == ncp2.node);
 			}
-			
+
 			DiffNode na1 = curNode1;
 			DiffNode na2 = curNode2;
-			
+
 			/**
 			 * Means: Node in T1 breaks so we have to split in T2 as well OR we
 			 * are at the end of the NOCSstr and have to split T2 because the
@@ -859,45 +861,45 @@ public class HDDiff
 			 */
 			if ((break1 && !break2 && !endNocs) || (break2 && endNocs))
 			{
-				curNode2 = na2.splitText(ncp2.pos - curNode2PosCorrect);
+				curNode2 = splitText(na2, ncp2.pos - curNode2PosCorrect, false/*recordSplitOps*/);
 				curNode2PosCorrect = ncp2.pos;
 				++splitCounter;
 				++nocssNodeSplitCount;
-				
+
 				if (break2)
 					correctNodeMapForward(nodeMap2, start2 + i, ncp2.node, curNode2, curNode2PosCorrect);
 			}
-			
+
 			if ((break2 && !break1 && !endNocs) || (break1 && endNocs))
 			{
-				curNode1 = na1.splitText(ncp1.pos - curNode1PosCorrect);
+				curNode1 = splitText(na1, ncp1.pos - curNode1PosCorrect, recordSplitOps);
 				curNode1PosCorrect = ncp1.pos;
 				++splitCounter;
 				++nocssNodeSplitCount;
-				
+
 				if (break1)
 					correctNodeMapForward(nodeMap1, start1 + i, ncp1.node, curNode1, curNode1PosCorrect);
 			}
-			
+
 			if (break1)
 			{
 				curNode1 = ncp1.node;
 				curNode1PosCorrect = 0;
 			}
-			
+
 			if (break2)
 			{
 				curNode2 = ncp2.node;
 				curNode2PosCorrect = 0;
 			}
-			
+
 			if ((break1 || break2) || endNocs)
 			{
 				int weight = nodeMetrics.computeWeight(na1);
 				map(na1, na2, weight);
 				++matchCounter;
 				++nocssNodeMatchCount;
-				
+
 				curNode1.setSplit(true);
 				if (curNode1 != na1)
 				{
@@ -914,12 +916,12 @@ public class HDDiff
 				}
 			}
 		}
-		
+
 		if (startSplit1 != null)
 			correctNodeMapBackward(nodeMap1, start1, startSplit1);
 		if (startSplit2 != null)
 			correctNodeMapBackward(nodeMap2, start2, startSplit2);
-		
+
 		if (isDebugEnabled())
 			report.debug(
 					"00.03.03) TNSM: NOCS = \"%s\", matches = %d, splits = %d",
@@ -927,7 +929,15 @@ public class HDDiff
 					matchCounter,
 					splitCounter);
 	}
-	
+
+	private DiffNode splitText(DiffNode node, int pos, boolean recordSplitOps)
+	{
+		DiffNode otherHalf = node.splitText(pos);
+		if (recordSplitOps)
+			editScript.add(new EditOpSplit(node, pos, otherHalf));
+		return otherHalf;
+	}
+
 	private int binarySearchBreak(
 			ArrayList<NodeCharPos> nodeMap1,
 			ArrayList<NodeCharPos> nodeMap2,
@@ -959,7 +969,7 @@ public class HDDiff
 		i = k;
 		return i;
 	}
-	
+
 	private void correctNodeMapBackward(
 			ArrayList<NodeCharPos> nodeMap,
 			int i,
@@ -975,7 +985,7 @@ public class HDDiff
 		ncp.node = newNode;
 		ncp.pos = 0; // unnecessary
 	}
-	
+
 	private void correctNodeMapForward(
 			ArrayList<NodeCharPos> nodeMap,
 			int i,
@@ -993,33 +1003,33 @@ public class HDDiff
 			++i;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private void bottomUpMatching()
 	{
 		Timer timer = null;
 		if (report != null)
 			timer = report.startTimer("00.04) Tree-to-tree bottom up (ancestor)");
-		
+
 		try
 		{
 			{
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.04.01) T2T BU: Gather candidates");
-				
+
 				try
 				{
 					// Again: Quite arbitrary choice of initial size of paths arrays
 					double depth = Math.log(nodeCount2) * 2;
 					ArrayList<DiffNode> path1 = new ArrayList<>((int) depth);
 					ArrayList<DiffNode> path2 = new ArrayList<>((int) depth);
-					
+
 					ancestorCandidates = new HashMap<>((nodeCount1 + nodeCount2) * 2);
-					
+
 					pathTypeLcs = new LcsMyers<>(new IsSameNodeTypeComparator());
-					
+
 					/**
 					 * We have to skip the root node which has already been
 					 * matched! This does not work if inner nodes are matched
@@ -1034,17 +1044,17 @@ public class HDDiff
 						timer2.stop();
 				}
 			}
-			
+
 			{
 				Timer timer2 = null;
 				if (report != null)
 					timer2 = report.startTimer("00.04.02) T2T BU: Candidate selection");
-				
+
 				try
 				{
 					Candidate[] sorted = ancestorCandidates.values().toArray(new Candidate[ancestorCandidates.size()]);
 					Arrays.sort(sorted);
-					
+
 					for (int i = 0; i < sorted.length; ++i)
 					{
 						Candidate c = sorted[i];
@@ -1063,15 +1073,15 @@ public class HDDiff
 		{
 			ancestorCandidates = null;
 			pathTypeLcs = null;
-			
+
 			if (timer != null)
 				timer.stop();
 		}
-		
+
 		if (report != null)
 			report.recordFigure("00.04.a) T2T BU: Ancestor nodes matched", bottomUpAncestorMatchCount, "#");
 	}
-	
+
 	private void gatherCandidates(
 			DiffNode node,
 			ArrayList<DiffNode> path1,
@@ -1081,7 +1091,7 @@ public class HDDiff
 		{
 			DiffNode partner = node.getPartner();
 			fillPartnerPath(partner, path1);
-			
+
 			/*int d = */pathTypeLcs.lcs(path1, path2);
 			ArrayList<DiffNode> s = pathTypeLcs.getLcs();
 			for (int i = 0; i < s.size();)
@@ -1098,10 +1108,10 @@ public class HDDiff
 			if (child != null)
 			{
 				path2.add(node);
-				
+
 				for (; child != null; child = child.getNextSibling())
 					gatherCandidates(child, path1, path2);
-				
+
 				removeLast(path2);
 			}
 			else
@@ -1110,7 +1120,7 @@ public class HDDiff
 			}
 		}
 	}
-	
+
 	private void addCandidate(DiffNode n1, DiffNode n2, int weight)
 	{
 		searchCandidate.n1 = n1;
@@ -1126,7 +1136,7 @@ public class HDDiff
 			ancestorCandidates.put(c, c);
 		}
 	}
-	
+
 	private void fillPartnerPath(DiffNode partner, ArrayList<DiffNode> path1)
 	{
 		path1.clear();
@@ -1145,47 +1155,47 @@ public class HDDiff
 		}
 		Collections.reverse(path1);
 	}
-	
+
 	private void removeLast(ArrayList<DiffNode> path)
 	{
 		path.remove(path.size() - 1);
 	}
-	
+
 	// =========================================================================
-	
+
 	private void topDownMatching()
 	{
 		// TODO: Make configuration option.
 		boolean matchByLabel = true;
-		
+
 		Timer timer2 = null;
 		if (report != null)
 			timer2 = report.startTimer("00.05) Tree-to-tree top down");
-		
+
 		try
 		{
 			siblingSeq1 = new ArrayList<>();
 			siblingSeq2 = new ArrayList<>();
-			
+
 			childHashLcs = new LcsMyers<>(new IsSameSubtreeHashComparator(minSubtreeWeight));
-			
+
 			siblingTypeLcs = new LcsMyers<>(matchByLabel ?
 					new IsMatchedOrSameNodeTypeComparator() :
 					new IsPartnerComparator());
-			
+
 			t2ttdSubtreeMatchCount = 0;
 			t2ttdSubtreeNodeMatchCount = 0;
 			t2ttdChildLabelNodeMatchCount = 0;
-			
+
 			checkUpdate(root1, root2);
 			topDownRec(root1, root2);
-			
+
 			if (report != null)
 			{
 				report.recordFigure("00.05.a) T2T TD: subtrees matched", t2ttdSubtreeMatchCount, "#");
 				report.recordFigure("00.05.b) T2T TD: nodes matched by subtree", t2ttdSubtreeNodeMatchCount, "#");
 				report.recordFigure("00.05.d) T2T TD: nodes matched by label", t2ttdChildLabelNodeMatchCount, "#");
-				
+
 				report.recordFigure("00.06.a) T2T ES: update count", editScriptUpdateCount, "#");
 				report.recordFigure("00.06.b) T2T ES: move count", editScriptMoveCount, "#");
 				report.recordFigure("00.06.c) T2T ES: insert count", editScriptInsertCount, "#");
@@ -1198,23 +1208,23 @@ public class HDDiff
 			siblingSeq2 = null;
 			childHashLcs = null;
 			siblingTypeLcs = null;
-			
+
 			if (timer2 != null)
 				timer2.stop();
 		}
 	}
-	
+
 	private void topDownRec(DiffNode n1, DiffNode n2)
 	{
 		if (n1 != n2.getPartner())
 			throw new AssertionError("n1 != n2.getPartner()");
-		
+
 		if (n2.isLeaf())
 			return;
-		
+
 		if (n1.isSubtreeMatched())
 			return;
-		
+
 		// TODO: Make configuration option.
 		boolean subtreeLcs = true;
 		if (!n1.isLeaf())
@@ -1223,16 +1233,16 @@ public class HDDiff
 			{
 				buildUnmatchedChildSeq(n1, siblingSeq1);
 				buildUnmatchedChildSeq(n2, siblingSeq2);
-				
+
 				topDownSubtreeLcs();
 			}
-			
+
 			buildCompleteChildSeq(n1, siblingSeq1);
 			buildCompleteChildSeq(n2, siblingSeq2);
-			
+
 			topDownLabelLcs(n1, n2);
 		}
-		
+
 		int i = 0;
 		for (DiffNode c2 = n2.getFirstChild(); c2 != null; c2 = c2.getNextSibling())
 		{
@@ -1240,16 +1250,16 @@ public class HDDiff
 			if (c1 == null)
 			{
 				c1 = c2.createSame(root1 /* for tree */);
-				
+
 				// TODO: Why is this necessary again?
 				map(c1, c2, -2);
-				
+
 				if (ASSERTIONS)
 				{
 					if (i != c2.indexOf())
 						throw new AssertionError("i != c2.indexOf()");
 				}
-				
+
 				editScript.add(new EditOpInsert(
 						n1,
 						c1,
@@ -1260,7 +1270,7 @@ public class HDDiff
 			else
 			{
 				checkUpdate(c1, c2);
-				
+
 				DiffNode parent1 = c1.getParent();
 				if (parent1 != n1)
 				{
@@ -1269,7 +1279,7 @@ public class HDDiff
 						if (i != c2.indexOf())
 							throw new AssertionError("i != c2.indexOf()");
 					}
-					
+
 					editScript.add(new EditOpMove(
 							c1,
 							n1,
@@ -1278,14 +1288,14 @@ public class HDDiff
 					++editScriptMoveCount;
 				}
 			}
-			
+
 			topDownRec(c1, c2);
 			++i;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private void buildUnmatchedChildSeq(DiffNode n, ArrayList<DiffNode> seq)
 	{
 		seq.clear();
@@ -1295,7 +1305,7 @@ public class HDDiff
 				seq.add(c);
 		}
 	}
-	
+
 	private void topDownSubtreeLcs()
 	{
 		int s1len = siblingSeq1.size();
@@ -1307,12 +1317,12 @@ public class HDDiff
 			DiffNode c2 = siblingSeq2.get(0);
 			if (c1.getSubtreeHash() == c2.getSubtreeHash())
 				mapSubtrees(c1, c2);
-			
+
 			return;
 		}
-		
+
 		/*int d = */childHashLcs.lcs(siblingSeq1, siblingSeq2);
-		
+
 		ArrayList<DiffNode> s = childHashLcs.getLcs();
 		for (int i = 0; i < s.size();)
 		{
@@ -1321,7 +1331,7 @@ public class HDDiff
 			topDownMapSubtrees(c1, c2);
 		}
 	}
-	
+
 	private void topDownMapSubtrees(DiffNode c1, DiffNode c2)
 	{
 		int nodesMatched = mapSubtrees(c1, c2);
@@ -1331,9 +1341,9 @@ public class HDDiff
 			++t2ttdSubtreeMatchCount;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private int mapSubtrees(DiffNode c1, DiffNode c2)
 	{
 		try
@@ -1350,15 +1360,15 @@ public class HDDiff
 			return 0;
 		}
 	}
-	
+
 	private int mapSubtreesRec(DiffNode n1, DiffNode n2) throws ComparisonException
 	{
 		int nodeMatchCount = 0;
-		
+
 		checkUpdate(n1, n2);
 		mapFull(n1, n2);
 		++nodeMatchCount;
-		
+
 		DiffNode c1 = n1.getFirstChild();
 		DiffNode c2 = n2.getFirstChild();
 		while ((c1 != null) && (c2 != null))
@@ -1367,15 +1377,15 @@ public class HDDiff
 			c1 = c1.getNextSibling();
 			c2 = c2.getNextSibling();
 		}
-		
+
 		return nodeMatchCount;
 	}
-	
+
 	private void checkSubtreeEqualityDeep(DiffNode n1, DiffNode n2) throws ComparisonException
 	{
 		if (!nodeMetrics.verifyHashEquality(n1, n2))
 			throw new ComparisonException();
-		
+
 		/**
 		 * This can happen if during bottom-up a parent could not be matched.
 		 * The parent might then get revisited by top-down and the LCS might try
@@ -1388,7 +1398,7 @@ public class HDDiff
 		DiffNode p2 = n2.getPartner();
 		if ((p2 != null) && (p2 != n1))
 			throw new ComparisonException();
-		
+
 		DiffNode c1 = n1.getFirstChild();
 		DiffNode c2 = n2.getFirstChild();
 		while ((c1 != null) && (c2 != null))
@@ -1397,31 +1407,31 @@ public class HDDiff
 			c1 = c1.getNextSibling();
 			c2 = c2.getNextSibling();
 		}
-		
+
 		if (c1 != c2)
 			throw new ComparisonException();
 	}
-	
+
 	// =========================================================================
-	
+
 	private void buildCompleteChildSeq(DiffNode n, ArrayList<DiffNode> seq)
 	{
 		seq.clear();
 		for (DiffNode c = n.getFirstChild(); c != null; c = c.getNextSibling())
 			seq.add(c);
 	}
-	
+
 	private void topDownLabelLcs(DiffNode n1, DiffNode n2)
 	{
 		siblingTypeLcs.lcs(siblingSeq1, siblingSeq2);
-		
+
 		ArrayList<DiffNode> s = siblingTypeLcs.getLcs();
-		
+
 		int i = 0;
 		for (int j = 0; j < siblingSeq2.size(); ++j)
 		{
 			DiffNode b = siblingSeq2.get(j);
-			
+
 			// An unaligned node must have a partner
 			DiffNode a = b.getPartner();
 			if (a != null)
@@ -1437,13 +1447,13 @@ public class HDDiff
 							if (j != b.indexOf())
 								throw new AssertionError("j != b.indexOf()");
 						}
-						
+
 						editScript.add(new EditOpMove(
 								a,
 								n1,
 								b,
 								j));
-						
+
 						++editScriptAlignmentCount;
 					}
 					else
@@ -1477,10 +1487,10 @@ public class HDDiff
 				{
 					DiffNode c1 = s.get(i++);
 					DiffNode c2 = s.get(i++);
-					
+
 					if (c1.getPartner() != null)
 						throw new AssertionError("c1.getPartner() != null");
-					
+
 					map(c1, c2, -3);
 					++t2ttdChildLabelNodeMatchCount;
 				}
@@ -1494,9 +1504,9 @@ public class HDDiff
 			}
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private void checkUpdate(DiffNode n1, DiffNode n2)
 	{
 		if (!n1.isNodeValueEqual(n2))
@@ -1508,25 +1518,25 @@ public class HDDiff
 			++editScriptUpdateCount;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private void gatherDeletes()
 	{
 		gatherDeletesRec(root1);
-		
+
 		if (report != null)
 			report.recordFigure("00.06.e) T2T ES: delete count", editScriptDeleteCount, "#");
 	}
-	
+
 	private void gatherDeletesRec(DiffNode n1)
 	{
 		for (DiffNode child = n1.getFirstChild(); child != null; child = child.getNextSibling())
 			gatherDeletesRec(child);
-		
+
 		checkDelete(n1);
 	}
-	
+
 	private void checkDelete(DiffNode n1)
 	{
 		if (n1.getPartner() == null)
@@ -1535,21 +1545,21 @@ public class HDDiff
 			++editScriptDeleteCount;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private void map(DiffNode nodeIn1, DiffNode nodeIn2, int common)
 	{
 		nodeIn1.set(nodeIn2, common);
 		nodeIn2.set(nodeIn1, common);
 	}
-	
+
 	private void mapFull(DiffNode n1, DiffNode n2)
 	{
 		n1.set(n2, n1.getWeight());
 		n2.set(n1, n1.getWeight());
 	}
-	
+
 	private boolean mapIfNotAlreadyMapped(DiffNode n1, DiffNode n2, int common)
 	{
 		if ((n1.getPartner() != null) || (n2.getPartner() != null))
@@ -1558,12 +1568,12 @@ public class HDDiff
 		n2.set(n1, common);
 		return true;
 	}
-	
+
 	private boolean isMatched(DiffNode node)
 	{
 		return (node.getPartner() != null);
 	}
-	
+
 	private static String abbreviateRep(String label)
 	{
 		label = label.replace("\n", "\\n");
@@ -1571,41 +1581,41 @@ public class HDDiff
 		label = StringUtils.abbreviateMiddle(label, "...", 64);
 		return label;
 	}
-	
+
 	private static String abbreviateRep(Object obj)
 	{
 		return abbreviateRep(String.valueOf(obj));
 	}
-	
+
 	private boolean isDebugEnabled()
 	{
 		return (report != null) && (report.isDebugEnabled());
 	}
-	
+
 	private boolean isWarningEnabled()
 	{
 		return (report != null) && (report.isWarningEnabled());
 	}
-	
+
 	// =========================================================================
-	
+
 	private static final class Candidate
 			implements
 				Comparable<Candidate>
 	{
 		private DiffNode n1;
-		
+
 		private DiffNode n2;
-		
+
 		private int common;
-		
+
 		public Candidate(DiffNode node, DiffNode partner, int common)
 		{
 			this.n1 = node;
 			this.n2 = partner;
 			this.common = common;
 		}
-		
+
 		@Override
 		public int hashCode()
 		{
@@ -1615,21 +1625,21 @@ public class HDDiff
 			result = prime * result + n2.hashCode();
 			return result;
 		}
-		
+
 		@Override
 		public boolean equals(Object obj)
 		{
 			Candidate other = (Candidate) obj;
 			return (other.n1 == this.n1) && (other.n2 == this.n2);
 		}
-		
+
 		@Override
 		public int compareTo(Candidate o)
 		{
 			// Sort DESCENDING
 			return -Integer.compare(this.common, o.common);
 		}
-		
+
 		@Override
 		public String toString()
 		{
@@ -1638,82 +1648,82 @@ public class HDDiff
 					", common=" + common + "]";
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private static final class SubtreeMatch
 			implements
 				Comparable<SubtreeMatch>
 	{
 		private final DiffNode n1;
-		
+
 		private final DiffNode n2;
-		
+
 		private final int weight;
-		
+
 		public SubtreeMatch(DiffNode n1, DiffNode n2, int weight)
 		{
 			this.n1 = n1;
 			this.n2 = n2;
 			this.weight = weight;
 		}
-		
+
 		@Override
 		public int compareTo(SubtreeMatch o)
 		{
 			// Sort DESCENDING
 			return -Integer.compare(weight, o.weight);
 		}
-		
+
 		@Override
 		public String toString()
 		{
 			return "SubtreeMatch [n1=" + abbreviateRep(n1) + ", n2=" + abbreviateRep(n2) + ", weight=" + weight + "]";
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private static final class NodeCharPos
 	{
 		DiffNode node;
-		
+
 		int pos;
-		
+
 		NodeCharPos(DiffNode node, int pos)
 		{
 			super();
 			this.node = node;
 			this.pos = pos;
 		}
-		
+
 		@Override
 		public String toString()
 		{
 			return "NodeCharPos [node=" + abbreviateRep(node) + ", pos=" + pos + "]";
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	private static final class IsSameSubtreeHashComparator
 			implements
 				ElementComparatorInterface<DiffNode>
 	{
 		private final int minSubtreeWeight;
-		
+
 		public IsSameSubtreeHashComparator(int minSubtreeWeight)
 		{
 			this.minSubtreeWeight = minSubtreeWeight;
 		}
-		
+
 		@Override
 		public boolean equals(DiffNode a, DiffNode b)
 		{
 			return (a.getSubtreeHash() == b.getSubtreeHash()) && (a.getWeight() > minSubtreeWeight);
 		}
 	}
-	
+
 	private static final class IsSameNodeTypeComparator
 			implements
 				ElementComparatorInterface<DiffNode>
@@ -1724,7 +1734,7 @@ public class HDDiff
 			return a.isSameNodeType(b);
 		}
 	}
-	
+
 	private static final class IsMatchedOrSameNodeTypeComparator
 			implements
 				ElementComparatorInterface<DiffNode>
@@ -1738,7 +1748,7 @@ public class HDDiff
 					(aPartner == b);
 		}
 	}
-	
+
 	private static final class IsPartnerComparator
 			implements
 				ElementComparatorInterface<DiffNode>
