@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.sweble.engine.serialization.WomSerializer;
+import org.sweble.wom3.Wom3Document;
 import org.sweble.wom3.Wom3Node;
 import org.w3c.dom.Document;
 
@@ -36,33 +37,33 @@ import de.fau.cs.osr.hddiff.wom.WomToDiffNodeConverter;
 public class SerializationUtils
 {
 	private final String prefix;
-	
+
 	private final File tempDir;
-	
+
 	private final WomSerializer serializer;
-	
+
 	// =========================================================================
-	
+
 	public SerializationUtils(String prefix)
 	{
 		this.prefix = prefix;
 		this.tempDir = new File(System.getProperty("java.io.tmpdir"));
 		this.serializer = new WomSerializer();
 	}
-	
+
 	// =========================================================================
-	
+
 	public PageRevWom xmlToWom(PageRevText prtParsed) throws Exception
 	{
-		Wom3Node womA = serializer.deserialize(
+		Wom3Document womA = (Wom3Document) serializer.deserialize(
 				prtParsed.textA.getBytes("UTF-8"), WomSerializer.SerializationFormat.XML, true);
-		
-		Wom3Node womB = serializer.deserialize(
+
+		Wom3Document womB = (Wom3Document) serializer.deserialize(
 				prtParsed.textB.getBytes("UTF-8"), WomSerializer.SerializationFormat.XML, true);
-		
+
 		return new PageRevWom(prtParsed.page, prtParsed.revA, prtParsed.revB, womA, womB);
 	}
-	
+
 	public PageRevDiffNode xmlToDiffNode(PageRevText prtParsed) throws Exception
 	{
 		PageRevWom prw = xmlToWom(prtParsed);
@@ -70,10 +71,10 @@ public class SerializationUtils
 		DiffNode nodeB = WomToDiffNodeConverter.preprocess(prw.womB);
 		return new PageRevDiffNode(prtParsed.page, prtParsed.revA, prtParsed.revB, nodeA, nodeB);
 	}
-	
+
 	// =========================================================================
-	
-	public File storeWomNiceTemp(PageRevWom prw, Revision rev, Wom3Node wom) throws Exception
+
+	public File storeWomNiceTemp(PageRevWom prw, Revision rev, Wom3Document wom) throws Exception
 	{
 		File file = File.createTempFile(makeNicePrefix(prw, rev), ".xml", tempDir);
 		file.deleteOnExit();
@@ -84,7 +85,7 @@ public class SerializationUtils
 		}
 		return file;
 	}
-	
+
 	public File storeWomCompactTemp(
 			PageRevDiffNode prdn,
 			Revision rev,
@@ -95,7 +96,7 @@ public class SerializationUtils
 		try (FileOutputStream output = new FileOutputStream(file))
 		{
 			byte[] bytes = serializer.serialize(
-					(Wom3Node) node.getNativeNode(),
+					getOwnerDocument((Wom3Node) node.getNativeNode()),
 					WomSerializer.SerializationFormat.XML,
 					true,
 					false);
@@ -103,7 +104,13 @@ public class SerializationUtils
 			return file;
 		}
 	}
-	
+
+	private Wom3Document getOwnerDocument(Wom3Node node)
+	{
+		Wom3Document doc = node.getOwnerDocument();
+		return ((doc != null) ? doc : (Wom3Document) node);
+	}
+
 	private String makeNicePrefix(PageRevWom prw, Revision rev)
 	{
 		return String.format("%s-p%d-r%d-nice-",
@@ -111,7 +118,7 @@ public class SerializationUtils
 				prw.page.getId(),
 				rev.getId());
 	}
-	
+
 	private String makeCompactPrefix(PageRevDiffNode prdn, Revision rev)
 	{
 		return String.format("%s-p%d-r%d-compact-",
@@ -119,26 +126,26 @@ public class SerializationUtils
 				prdn.page.getId(),
 				rev.getId());
 	}
-	
+
 	// =========================================================================
-	
+
 	public File createTempDiffFile(PageRevDiffNode prdn) throws IOException
 	{
 		File fileDiff = File.createTempFile(makeDiffPrefix(prdn), ".xml", tempDir);
 		fileDiff.deleteOnExit();
 		return fileDiff;
 	}
-	
+
 	public Document parseXml(File fileDiff) throws Exception
 	{
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		dbFactory.setNamespaceAware(true);
-		
+
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(fileDiff);
 		return doc;
 	}
-	
+
 	private String makeDiffPrefix(PageRevDiffNode prdn)
 	{
 		return String.format("%s-p%d-r%d-r%d-diff-",
