@@ -29,7 +29,7 @@
 
 	<groupId>de.fau.cs.osr.hddiff</groupId>
 	<artifactId>hddiff-parent</artifactId>
-	<version>2.0.2-SNAPSHOT</version>
+	<version>2.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>HDDiff Parent</name>
 	<inceptionYear>2014</inceptionYear>
@@ -65,7 +65,7 @@
 		<osr-common.version>3.0.3</osr-common.version>
 		<sweble.version>3.1.0</sweble.version>
 		<!-- Should be ${project.version} but that causes trouble with the release plugin -->
-		<hddiff.version>2.0.2-SNAPSHOT</hddiff.version>
+		<hddiff.version>2.0.3-SNAPSHOT</hddiff.version>
 	</properties>
 
 	<!-- =================================================================== -->
