@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.0.2 - 2016-06-13
+### Changed
+- Adapted to breaking interface changes in WomSerializer
+
 ## 2.0.1 - 2016-06-07
 ### Added
 - Split operations can be recorded (off by default)

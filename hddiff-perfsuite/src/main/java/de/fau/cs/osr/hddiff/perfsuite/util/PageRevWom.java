@@ -17,7 +17,7 @@
  */
 package de.fau.cs.osr.hddiff.perfsuite.util;
 
-import org.sweble.wom3.Wom3Node;
+import org.sweble.wom3.Wom3Document;
 
 import de.fau.cs.osr.hddiff.perfsuite.model.Page;
 import de.fau.cs.osr.hddiff.perfsuite.model.Revision;
@@ -25,19 +25,23 @@ import de.fau.cs.osr.hddiff.perfsuite.model.Revision;
 public final class PageRevWom
 {
 	public final Page page;
-	
+
 	public final Revision revA;
-	
+
 	public final Revision revB;
-	
-	public final Wom3Node womA;
-	
-	public final Wom3Node womB;
-	
+
+	public final Wom3Document womA;
+
+	public final Wom3Document womB;
+
 	// =========================================================================
-	
-	public PageRevWom(Page page, Revision revA, Revision revB, Wom3Node womA,
-			Wom3Node womB)
+
+	public PageRevWom(
+			Page page,
+			Revision revA,
+			Revision revB,
+			Wom3Document womA,
+			Wom3Document womB)
 	{
 		this.page = page;
 		this.revA = revA;
