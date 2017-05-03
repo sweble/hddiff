@@ -2,8 +2,8 @@
 
 ## Unreleased
 ### Changed
-- Bumped version of tooling parent pom and osr-common dependencies to 3.0.5
-- Bumped version of sweble dependencies to 3.1.4
+- Bumped version of tooling parent pom and osr-common dependencies to 3.0.6-SNAPSHOT
+- Bumped version of sweble dependencies to 3.1.5-SNAPSHOT
 
 ## 2.0.3 - 2017-01-16
 ### Changed
