@@ -37,6 +37,7 @@ import de.fau.cs.osr.hddiff.editscript.EditOpUpdate;
 import de.fau.cs.osr.hddiff.tree.DiffNode;
 import de.fau.cs.osr.hddiff.tree.NodeEligibilityTesterInterface;
 import de.fau.cs.osr.hddiff.tree.NodeMetricsInterface;
+import de.fau.cs.osr.hddiff.tree.NodeUpdate;
 import de.fau.cs.osr.hddiff.utils.ElementComparatorInterface;
 import de.fau.cs.osr.hddiff.utils.HDDiffTreeVisualizer;
 import de.fau.cs.osr.hddiff.utils.LcsMyers;
@@ -1509,11 +1510,12 @@ public class HDDiff
 
 	private void checkUpdate(DiffNode n1, DiffNode n2)
 	{
-		if (!n1.isNodeValueEqual(n2))
+		NodeUpdate update = n1.compareWith(n2);
+		if (update != null)
 		{
 			editScript.add(new EditOpUpdate(
 					n1,
-					n2.getNodeValue(),
+					update,
 					n2));
 			++editScriptUpdateCount;
 		}

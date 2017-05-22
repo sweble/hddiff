@@ -18,6 +18,7 @@
 package de.fau.cs.osr.hddiff.editscript;
 
 import de.fau.cs.osr.hddiff.tree.DiffNode;
+import de.fau.cs.osr.hddiff.tree.NodeUpdate;
 
 /**
  * A node was found in the right tree whose value does not match its partner
@@ -29,56 +30,65 @@ public class EditOpUpdate
 			EditOp
 {
 	private final DiffNode updatedNode;
-	
-	private final Object newNodeValue;
-	
+
+	//private final Object newNodeValue;
+
+	private final NodeUpdate update;
+
 	/**
 	 * Additional information: The right, already updated node.
 	 */
 	private final DiffNode updatedNodeRight;
-	
+
 	// =========================================================================
-	
+
 	public EditOpUpdate(
 			DiffNode updatedNode,
-			Object newNodeValue,
+			NodeUpdate update,
 			DiffNode updatedNodeRight)
 	{
 		this.updatedNode = updatedNode;
-		this.newNodeValue = newNodeValue;
+		this.update = update;
 		this.updatedNodeRight = updatedNodeRight;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public Operation getType()
 	{
 		return Operation.UPDATE;
 	}
-	
+
 	// =========================================================================
-	
+
 	public DiffNode getUpdatedNode()
 	{
 		return updatedNode;
 	}
-	
+
+	public NodeUpdate getUpdate()
+	{
+		return update;
+	}
+
+	/*
 	public Object getNewNodeValue()
 	{
 		return newNodeValue;
 	}
-	
+	*/
+
 	public DiffNode getUpdatedNodeRight()
 	{
 		return updatedNodeRight;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public String toString()
 	{
-		return "DiffNodeEditOpUpdate [node=" + updatedNode + ", newNodeValue=" + newNodeValue + "]";
+		return "DiffNodeEditOpUpdate [node=" + updatedNode + ", update=" + update + "]";
 	}
 }

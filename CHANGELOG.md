@@ -4,6 +4,8 @@
 ### Changed
 - Bumped version of tooling parent pom and osr-common dependencies to 3.0.6-SNAPSHOT
 - Bumped version of sweble dependencies to 3.1.5-SNAPSHOT
+- Change NodeUpdate interface and DiffNode interface: compareWith and applyUpdate 
+  replace isNodeValueEqual, getNodeValue and setNodeValue
 
 ## 2.0.3 - 2017-01-16
 ### Changed

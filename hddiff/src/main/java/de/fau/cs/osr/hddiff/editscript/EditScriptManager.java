@@ -31,22 +31,22 @@ import de.fau.cs.osr.hddiff.tree.DiffNode;
 public class EditScriptManager
 {
 	private static final boolean ASSERTIONS = true;
-	
+
 	private final List<EditOp> editScript;
-	
+
 	private final HashMap<DiffNode, Effect> effects;
-	
+
 	// =========================================================================
-	
+
 	public EditScriptManager(List<EditOp> editScript)
 	{
 		this.editScript = editScript;
 		this.effects = new HashMap<>(editScript.size());
 		parse();
 	}
-	
+
 	// =========================================================================
-	
+
 	private void parse()
 	{
 		for (EditOp eo : editScript)
@@ -66,40 +66,43 @@ public class EditScriptManager
 				case UPDATE:
 					addMapping((EditOpUpdate) eo);
 					break;
+				case SPLIT:
+					// Splits were already applied during diffing.
+					break;
 			}
 		}
 	}
-	
+
 	private void addMapping(EditOpUpdate upd)
 	{
 		Effect e = addEffect(upd.getUpdatedNode());
 		e.setIsUpdated(upd);
 	}
-	
+
 	private void addMapping(EditOpMove mov)
 	{
 		Effect e = addEffect(mov.getToParent());
 		e.addNewChild(mov);
-		
+
 		e = addEffect(mov.getMovedNode());
 		e.setIsMoved(mov);
 	}
-	
+
 	private void addMapping(EditOpInsert ins)
 	{
 		Effect e = addEffect(ins.getParent());
 		e.addNewChild(ins);
-		
+
 		e = addEffect(ins.getInsertedNode());
 		e.setIsInserted(ins);
 	}
-	
+
 	private void addMapping(EditOpDelete del)
 	{
 		Effect e = addEffect(del.getDeletedNode());
 		e.setIsDeleted(del);
 	}
-	
+
 	private Effect addEffect(DiffNode key)
 	{
 		Effect l = effects.get(key);
@@ -107,15 +110,15 @@ public class EditScriptManager
 			effects.put(key, l = new Effect());
 		return l;
 	}
-	
+
 	// =========================================================================
-	
+
 	public void apply()
 	{
 		processRemoves();
 		processNonRemoves();
 	}
-	
+
 	private void processRemoves()
 	{
 		ListIterator<EditOp> i = editScript.listIterator(editScript.size());
@@ -128,56 +131,56 @@ public class EditScriptManager
 					EditOpDelete del = (EditOpDelete) op;
 					del.getDeletedNode().removeFromParent();
 					break;
-				
+
 				case MOVE:
 					EditOpMove mov = (EditOpMove) op;
 					mov.getMovedNode().removeFromParent();
 					break;
-				
+
 				default:
 					break;
 			}
 		}
 	}
-	
+
 	private void processNonRemoves()
 	{
 		for (Entry<DiffNode, Effect> e : effects.entrySet())
 		{
 			DiffNode affectedParent = e.getKey();
 			Effect effect = e.getValue();
-			
+
 			if (effect.isUpdated())
 			{
 				EditOpUpdate upd = effect.getUpdateOp();
-				upd.getUpdatedNode().setNodeValue(upd.getNewNodeValue());
+				upd.getUpdatedNode().applyUpdate(upd.getUpdate());
 			}
-			
+
 			Iterator<InsertOp> insIt = effect.getInserts().iterator();
 			if (!insIt.hasNext())
 				continue;
-			
+
 			int i = 0;
 			InsertOp ins = insIt.next();
 			DiffNode child = affectedParent.getFirstChild();
-			
+
 			L2: while ((ins != null) || (child != null))
 			{
 				while ((ins != null) && (ins.getFinalPosition() == i))
 				{
 					affectedParent.appendOrInsert(ins.getInsertedNode(), child);
-					
+
 					if (ASSERTIONS && (ins.getInsertedNode().indexOf() != ins.getFinalPosition()))
 						throw new AssertionError();
-					
+
 					if (!insIt.hasNext())
 						// No more inserts, no point going on...
 						break L2;
-					
+
 					ins = insIt.next();
 					++i;
 				}
-				
+
 				if (child != null)
 				{
 					child = child.getNextSibling();
@@ -186,87 +189,87 @@ public class EditScriptManager
 			}
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	public static final class Effect
 	{
 		private EditOpUpdate upd;
-		
+
 		private EditOpMove mov;
-		
+
 		private EditOpInsert ins;
-		
+
 		private EditOpDelete del;
-		
+
 		private boolean removed;
-		
+
 		private boolean sorted;
-		
+
 		private List<InsertOp> inserts = null;
-		
+
 		// =====================================================================
-		
+
 		public void setIsUpdated(EditOpUpdate upd)
 		{
 			this.upd = upd;
 		}
-		
+
 		public boolean isUpdated()
 		{
 			return upd != null;
 		}
-		
+
 		public EditOpUpdate getUpdateOp()
 		{
 			return upd;
 		}
-		
+
 		public void setIsMoved(EditOpMove mov)
 		{
 			this.mov = mov;
 		}
-		
+
 		public boolean isMoved()
 		{
 			return mov != null;
 		}
-		
+
 		public EditOpMove getMoveOp()
 		{
 			return mov;
 		}
-		
+
 		public void setIsInserted(EditOpInsert ins)
 		{
 			this.ins = ins;
 		}
-		
+
 		public boolean isInserted()
 		{
 			return ins != null;
 		}
-		
+
 		public EditOpInsert getInsertOp()
 		{
 			return ins;
 		}
-		
+
 		public void setIsDeleted(EditOpDelete del)
 		{
 			this.del = del;
 		}
-		
+
 		public boolean isDeleted()
 		{
 			return del != null;
 		}
-		
+
 		public EditOpDelete getDeleteOp()
 		{
 			return del;
 		}
-		
+
 		public void addNewChild(EditOpInsert ins)
 		{
 			getInsertsForWriting().add(new InsertOp(
@@ -274,7 +277,7 @@ public class EditScriptManager
 					ins.getInsertedNode(),
 					ins.getFinalPosition()));
 		}
-		
+
 		public void addNewChild(EditOpMove mov)
 		{
 			getInsertsForWriting().add(new InsertOp(
@@ -282,7 +285,7 @@ public class EditScriptManager
 					mov.getMovedNode(),
 					mov.getFinalPosition()));
 		}
-		
+
 		private List<InsertOp> getInsertsForWriting()
 		{
 			sorted = false;
@@ -290,7 +293,7 @@ public class EditScriptManager
 				inserts = new LinkedList<>();
 			return inserts;
 		}
-		
+
 		public Collection<InsertOp> getInserts()
 		{
 			if (inserts == null)
@@ -302,34 +305,34 @@ public class EditScriptManager
 			}
 			return inserts;
 		}
-		
+
 		// =====================================================================
-		
+
 		public boolean isRemoved()
 		{
 			return removed;
 		}
-		
+
 		public void setRemoved(boolean removed)
 		{
 			this.removed = removed;
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	public static final class InsertOp
 			implements
 				Comparable<InsertOp>
 	{
 		private final EditOp op;
-		
+
 		private final int finalPosition;
-		
+
 		private final DiffNode insertedNode;
-		
+
 		// =====================================================================
-		
+
 		public InsertOp(
 				EditOp op,
 				DiffNode insertedNode,
@@ -339,24 +342,24 @@ public class EditScriptManager
 			this.finalPosition = finalPosition;
 			this.insertedNode = insertedNode;
 		}
-		
+
 		// =====================================================================
-		
+
 		public EditOp getOp()
 		{
 			return op;
 		}
-		
+
 		public int getFinalPosition()
 		{
 			return finalPosition;
 		}
-		
+
 		public DiffNode getInsertedNode()
 		{
 			return insertedNode;
 		}
-		
+
 		@Override
 		public int compareTo(InsertOp o)
 		{

@@ -22,6 +22,7 @@ import org.sweble.wom3.Wom3ElementNode;
 import org.sweble.wom3.Wom3Node;
 
 import de.fau.cs.osr.hddiff.tree.DiffNode;
+import de.fau.cs.osr.hddiff.tree.NodeUpdate;
 
 public class WomDiffNodeAdapterTextContainer
 		extends
@@ -35,6 +36,20 @@ public class WomDiffNodeAdapterTextContainer
 	// =========================================================================
 	
 	@Override
+	public void applyUpdate(NodeUpdate value_)
+	{
+		Wom3NodeUpdate2 value = (Wom3NodeUpdate2) value_;
+		
+		if (value.attributes != null)
+			throw new IllegalArgumentException();
+		
+		String newValue = value.value;
+		if (!compareStrings(node.getTextContent(), newValue))
+			node.setTextContent(newValue);
+	}
+	
+	/*
+	@Override
 	public void setNodeValue(Object value_)
 	{
 		Wom3NodeUpdate value = (Wom3NodeUpdate) value_;
@@ -46,7 +61,9 @@ public class WomDiffNodeAdapterTextContainer
 		if (!compareStrings(node.getTextContent(), newValue))
 			node.setTextContent(newValue);
 	}
+	*/
 	
+	/*
 	@Override
 	public Object getNodeValue()
 	{
@@ -54,7 +71,24 @@ public class WomDiffNodeAdapterTextContainer
 				null,
 				node.getTextContent());
 	}
-	
+	*/
+
+	@Override
+	public NodeUpdate compareWith(DiffNode o)
+	{
+		if (!isSameNodeType(o))
+			throw new IllegalArgumentException();
+
+		Wom3Node a = this.node;
+		Wom3Node b = ((WomDiffNodeAdapter) o).node;
+
+		if (compareStrings(a.getTextContent(), b.getTextContent()))
+			return null;
+
+		return new Wom3NodeUpdate2(null, o.getTextContent());
+	}
+
+	/*
 	@Override
 	public boolean isNodeValueEqual(DiffNode o)
 	{
@@ -66,6 +100,7 @@ public class WomDiffNodeAdapterTextContainer
 		
 		return compareStrings(a.getTextContent(), b.getTextContent());
 	}
+	*/
 	
 	// =========================================================================
 	

@@ -26,6 +26,7 @@ import de.fau.cs.osr.hddiff.editscript.EditOpInsert;
 import de.fau.cs.osr.hddiff.editscript.EditOpMove;
 import de.fau.cs.osr.hddiff.editscript.EditOpUpdate;
 import de.fau.cs.osr.hddiff.tree.DiffNode;
+import de.fau.cs.osr.hddiff.tree.NodeUpdate;
 import de.fau.cs.osr.hddiff.utils.ReportItem;
 
 /**
@@ -158,11 +159,12 @@ public class EditScriptBuilder
 			DiffNode nRight,
 			DiffNode nLeft)
 	{
-		if (!nLeft.isNodeValueEqual(nRight))
+		NodeUpdate update = nLeft.compareWith(nRight);
+		if (update != null)
 		{
 			editScript.add(new EditOpUpdate(
 					nLeft,
-					nRight.getNodeValue(),
+					update,
 					nRight));
 			return 1;
 		}
