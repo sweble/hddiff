@@ -32,46 +32,21 @@ public class WomDiffNodeAdapterTextContainer
 	{
 		super(node);
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public void applyUpdate(NodeUpdate value_)
 	{
 		Wom3NodeUpdate2 value = (Wom3NodeUpdate2) value_;
-		
+
 		if (value.attributes != null)
 			throw new IllegalArgumentException();
-		
+
 		String newValue = value.value;
 		if (!compareStrings(node.getTextContent(), newValue))
 			node.setTextContent(newValue);
 	}
-	
-	/*
-	@Override
-	public void setNodeValue(Object value_)
-	{
-		Wom3NodeUpdate value = (Wom3NodeUpdate) value_;
-		
-		if (value.attributes != null)
-			throw new IllegalArgumentException();
-		
-		String newValue = value.value;
-		if (!compareStrings(node.getTextContent(), newValue))
-			node.setTextContent(newValue);
-	}
-	*/
-	
-	/*
-	@Override
-	public Object getNodeValue()
-	{
-		return new Wom3NodeUpdate(
-				null,
-				node.getTextContent());
-	}
-	*/
 
 	@Override
 	public NodeUpdate compareWith(DiffNode o)
@@ -88,56 +63,42 @@ public class WomDiffNodeAdapterTextContainer
 		return new Wom3NodeUpdate2(null, o.getTextContent());
 	}
 
-	/*
-	@Override
-	public boolean isNodeValueEqual(DiffNode o)
-	{
-		if (!isSameNodeType(o))
-			throw new IllegalArgumentException();
-		
-		Wom3Node a = this.node;
-		Wom3Node b = ((WomDiffNodeAdapter) o).node;
-		
-		return compareStrings(a.getTextContent(), b.getTextContent());
-	}
-	*/
-	
 	// =========================================================================
-	
+
 	protected Wom3ElementNode createSameWom(DiffNode forRoot_)
 	{
 		WomDiffNodeAdapter forRoot = (WomDiffNodeAdapter) forRoot_;
 		Wom3Document doc = forRoot.node.getOwnerDocument();
 		if (doc == null)
 			doc = (Wom3Document) forRoot.node;
-		
+
 		Wom3Node prototype = node;
-		
+
 		Wom3ElementNode elem = (prototype.getNamespaceURI() == null) ?
 				(Wom3ElementNode) doc.createElement(prototype.getNodeName()) :
 				(Wom3ElementNode) doc.createElementNS(
 						prototype.getNamespaceURI(),
 						prototype.getNodeName());
-		
+
 		elem.appendChild(doc.createTextNode(node.getTextContent()));
-		
+
 		return elem;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public boolean isLeaf()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isTextLeaf()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public String getTextContent()
 	{

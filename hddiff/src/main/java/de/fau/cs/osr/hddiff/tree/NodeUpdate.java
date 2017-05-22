@@ -19,5 +19,5 @@ package de.fau.cs.osr.hddiff.tree;
 
 public interface NodeUpdate
 {
-
+	void applyUpdates(Object node);
 }
