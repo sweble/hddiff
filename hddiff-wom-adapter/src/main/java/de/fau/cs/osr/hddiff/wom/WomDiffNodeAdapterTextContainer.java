@@ -38,7 +38,7 @@ public class WomDiffNodeAdapterTextContainer
 	@Override
 	public void applyUpdate(NodeUpdate value_)
 	{
-		Wom3NodeUpdate2 value = (Wom3NodeUpdate2) value_;
+		Wom3NodeUpdate value = (Wom3NodeUpdate) value_;
 
 		if (value.attributes != null)
 			throw new IllegalArgumentException();
@@ -60,7 +60,7 @@ public class WomDiffNodeAdapterTextContainer
 		if (compareStrings(a.getTextContent(), b.getTextContent()))
 			return null;
 
-		return new Wom3NodeUpdate2(null, o.getTextContent());
+		return new Wom3NodeUpdate(null, o.getTextContent());
 	}
 
 	// =========================================================================

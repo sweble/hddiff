@@ -154,14 +154,14 @@ public class WomDiffNodeAdapter
 		if (!(aac.isEmpty() && bac.isEmpty()))
 		{
 			if (aac.size() != bac.size())
-				return new Wom3NodeUpdate2(bac, null);
+				return new Wom3NodeUpdate(bac, null);
 
 			Iterator<Wom3Attribute> aai = aac.iterator();
 			Iterator<Wom3Attribute> bai = bac.iterator();
 			while (aai.hasNext())
 			{
 				if (!attrEquals(aai.next(), bai.next()))
-					return new Wom3NodeUpdate2(bac, null);
+					return new Wom3NodeUpdate(bac, null);
 			}
 		}
 		return null;
@@ -178,7 +178,7 @@ public class WomDiffNodeAdapter
 	@Override
 	public void applyUpdate(NodeUpdate value_)
 	{
-		Wom3NodeUpdate2 value = (Wom3NodeUpdate2) value_;
+		Wom3NodeUpdate value = (Wom3NodeUpdate) value_;
 
 		if (value.value != null)
 			throw new IllegalArgumentException();
@@ -349,13 +349,13 @@ public class WomDiffNodeAdapter
 
 	// =========================================================================
 
-	public static final class Wom3NodeUpdate2 implements NodeUpdate
+	public static final class Wom3NodeUpdate implements NodeUpdate
 	{
 		public final Collection<Wom3Attribute> attributes;
 
 		public final String value;
 
-		public Wom3NodeUpdate2(Collection<Wom3Attribute> attributes, String value)
+		public Wom3NodeUpdate(Collection<Wom3Attribute> attributes, String value)
 		{
 			this.attributes = attributes;
 			this.value = value;
