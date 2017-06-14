@@ -30,6 +30,7 @@ import org.sweble.wom3.Wom3ElementNode;
 import org.sweble.wom3.Wom3Node;
 
 import de.fau.cs.osr.hddiff.tree.DiffNode;
+import de.fau.cs.osr.hddiff.tree.NodeUpdate;
 import de.fau.cs.osr.utils.ComparisonException;
 
 public class WomDiffNodeAdapter
@@ -37,39 +38,39 @@ public class WomDiffNodeAdapter
 			DiffNode
 {
 	protected Wom3Node node;
-	
+
 	// =========================================================================
-	
+
 	public WomDiffNodeAdapter(Wom3Node node)
 	{
 		this.node = node;
 	}
-	
+
 	// =========================================================================
-	
+
 	public Wom3Node getWomNode()
 	{
 		return node;
 	}
-	
+
 	@Override
 	public Object getNativeNode()
 	{
 		return getWomNode();
 	}
-	
+
 	public boolean isRtd()
 	{
 		return false;
 	}
-	
+
 	public boolean isNonRtdTextLeaf()
 	{
 		return false;
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public Object getType()
 	{
@@ -78,21 +79,21 @@ public class WomDiffNodeAdapter
 			return node.getNodeName();
 		return node.getNamespaceURI() + node.getLocalName();
 	}
-	
+
 	@Override
 	public boolean isSameNodeType(DiffNode o)
 	{
 		return getType().equals(o.getType());
 	}
-	
+
 	@Override
 	public String getLabel()
 	{
 		return node.getNodeName();
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public DiffNode createSame(DiffNode forRoot_)
 	{
@@ -100,20 +101,20 @@ public class WomDiffNodeAdapter
 		Wom3Document doc = forRoot.node.getOwnerDocument();
 		if (doc == null)
 			doc = (Wom3Document) forRoot.node;
-		
+
 		Wom3Node prototype = node;
-		
+
 		Wom3ElementNode elem = (prototype.getNamespaceURI() == null) ?
 				(Wom3ElementNode) doc.createElement(prototype.getNodeName()) :
 				(Wom3ElementNode) doc.createElementNS(
 						prototype.getNamespaceURI(),
 						prototype.getNodeName());
-		
+
 		copyAttributes(elem, prototype.getWomAttributes());
-		
+
 		return new WomDiffNodeAdapter(elem);
 	}
-	
+
 	@Override
 	protected void appendOrInsertNativeOnly(
 			DiffNode newChild_,
@@ -121,13 +122,13 @@ public class WomDiffNodeAdapter
 	{
 		WomDiffNodeAdapter newChild = (WomDiffNodeAdapter) newChild_;
 		WomDiffNodeAdapter refChild = (WomDiffNodeAdapter) refChild_;
-		
+
 		if (refChild != null)
 			node.insertBefore(newChild.node, refChild.node);
 		else
 			node.appendChild(newChild.node);
 	}
-	
+
 	@Override
 	protected void removeFromParentNativeOnly()
 	{
@@ -135,37 +136,37 @@ public class WomDiffNodeAdapter
 			throw new UnsupportedOperationException();
 		node.getParentNode().removeChild(node);
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
-	public boolean isNodeValueEqual(DiffNode o)
+	public NodeUpdate compareWith(DiffNode o)
 	{
 		if (!isSameNodeType(o))
 			throw new IllegalArgumentException();
-		
+
 		Wom3Node a = this.node;
 		Wom3Node b = ((WomDiffNodeAdapter) o).node;
-		
+
 		Collection<Wom3Attribute> aac = a.getWomAttributes();
 		Collection<Wom3Attribute> bac = b.getWomAttributes();
-		
+
 		if (!(aac.isEmpty() && bac.isEmpty()))
 		{
 			if (aac.size() != bac.size())
-				return false;
-			
+				return new Wom3NodeUpdate(bac, null);
+
 			Iterator<Wom3Attribute> aai = aac.iterator();
 			Iterator<Wom3Attribute> bai = bac.iterator();
 			while (aai.hasNext())
 			{
 				if (!attrEquals(aai.next(), bai.next()))
-					return false;
+					return new Wom3NodeUpdate(bac, null);
 			}
 		}
-		return true;
+		return null;
 	}
-	
+
 	private boolean attrEquals(Wom3Attribute a, Wom3Attribute b)
 	{
 		return compareStrings(a.getNamespaceURI(), b.getNamespaceURI()) &&
@@ -173,21 +174,15 @@ public class WomDiffNodeAdapter
 				a.getNodeName().equals(b.getNodeName()) &&
 				a.getNodeValue().equals(b.getNodeValue());
 	}
-	
+
 	@Override
-	public Object getNodeValue()
-	{
-		return new Wom3NodeUpdate(node.getWomAttributes(), null);
-	}
-	
-	@Override
-	public void setNodeValue(Object value_)
+	public void applyUpdate(NodeUpdate value_)
 	{
 		Wom3NodeUpdate value = (Wom3NodeUpdate) value_;
-		
+
 		if (value.value != null)
 			throw new IllegalArgumentException();
-		
+
 		Collection<Wom3Attribute> newAttrs = value.attributes;
 		if (node.hasAttributes())
 		{
@@ -198,7 +193,7 @@ public class WomDiffNodeAdapter
 		if (!newAttrs.isEmpty())
 			copyAttributes((Wom3ElementNode) node, newAttrs);
 	}
-	
+
 	private void copyAttributes(
 			Wom3ElementNode elem,
 			Collection<Wom3Attribute> newAttrs)
@@ -211,41 +206,41 @@ public class WomDiffNodeAdapter
 				elem.setAttribute(a.getNodeName(), a.getNodeValue());
 		}
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public boolean isLeaf()
 	{
 		return getFirstChild() == null;
 	}
-	
+
 	@Override
 	public boolean isTextLeaf()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public String getTextContent()
 	{
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public DiffNode splitText(int pos)
 	{
 		throw new UnsupportedOperationException();
 	}
-	
+
 	// =========================================================================
-	
+
 	@Override
 	public void compareNativeDeep(DiffNode o) throws ComparisonException
 	{
 		compare(this.node, ((WomDiffNodeAdapter) o).node);
 	}
-	
+
 	private void compare(Wom3Node a, Wom3Node b) throws ComparisonException
 	{
 		if (a.getNodeType() != b.getNodeType())
@@ -273,7 +268,7 @@ public class WomDiffNodeAdapter
 			throw new ComparisonException(a, b);
 		}
 	}
-	
+
 	private boolean compareAttributes(
 			Collection<Wom3Attribute> a,
 			Collection<Wom3Attribute> b)
@@ -320,10 +315,11 @@ public class WomDiffNodeAdapter
 		}
 		return true;
 	}
-	
+
 	private boolean compareChildren(
 			Collection<Wom3Node> a,
-			Collection<Wom3Node> b) throws ComparisonException
+			Collection<Wom3Node> b)
+		throws ComparisonException
 	{
 		if (a.size() != b.size())
 		{
@@ -337,35 +333,34 @@ public class WomDiffNodeAdapter
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void setNativeId(String id)
 	{
 		((Wom3ElementNode) node).setAttribute("id", id);
 	}
-	
+
 	// =========================================================================
-	
+
 	protected boolean compareStrings(String a, String b)
 	{
 		return (a != null) ? a.equals(b) : (b == null);
 	}
-	
+
 	// =========================================================================
-	
-	public static final class Wom3NodeUpdate
+
+	public static final class Wom3NodeUpdate implements NodeUpdate
 	{
 		public final Collection<Wom3Attribute> attributes;
-		
+
 		public final String value;
-		
+
 		public Wom3NodeUpdate(Collection<Wom3Attribute> attributes, String value)
 		{
-			super();
 			this.attributes = attributes;
 			this.value = value;
 		}
-		
+
 		@Override
 		public String toString()
 		{
@@ -373,6 +368,12 @@ public class WomDiffNodeAdapter
 				return "Wom3NodeUpdate [value=" + value + "]";
 			else
 				return "Wom3NodeUpdate [attributes=" + Arrays.toString(attributes.toArray()) + "]";
+		}
+
+		@Override
+		public void applyUpdates(Object node)
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 }

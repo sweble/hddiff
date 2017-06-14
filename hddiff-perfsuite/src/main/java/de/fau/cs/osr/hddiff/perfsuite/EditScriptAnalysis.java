@@ -94,6 +94,9 @@ public class EditScriptAnalysis
 				case UPDATE:
 					addUpdate((EditOpUpdate) eo);
 					break;
+				case SPLIT:
+					// Splits were already applied during diffing.
+					break;
 			}
 		}
 	}
