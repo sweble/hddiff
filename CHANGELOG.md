@@ -1,6 +1,10 @@
 # Change Log
 
 ## Unreleased
+### Changed
+- Added jenkins profile which generates coverage reports when build in Jenkins.
+- Bumped version of osr-common dependencies to 3.0.7-SNAPSHOT
+- Bumped version of sweble dependencies to 3.1.6-SNAPSHOT
 
 ## 2.0.4 - 2017-06-14
 ### Changed
